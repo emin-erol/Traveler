@@ -89,15 +89,15 @@ namespace Traveler.WebUI.Controllers
                         var claims = new List<Claim>
                         {
                             new Claim(ClaimTypes.NameIdentifier, user.Id),
-                            new Claim(ClaimTypes.Name, user.UserName),
-                            new Claim(ClaimTypes.Email, user.Email)
+                            new Claim(ClaimTypes.Name, user.Name + " " + user.Surname),
+                            new Claim(ClaimTypes.Email, user.Email),
                         };
 
                         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                         var principal = new ClaimsPrincipal(identity);
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-                        return Json(new { success = true, redirectUrl = Url.Action("Index", "MainPage", new { area = "Admin" }) });
+                        return Json(new { success = true, redirectUrl = Url.Action("Index", "Home") });
                     }
                     else
                     {
@@ -140,7 +140,7 @@ namespace Traveler.WebUI.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("LoginModal", "Management");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

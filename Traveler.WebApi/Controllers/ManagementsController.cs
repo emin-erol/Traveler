@@ -94,7 +94,9 @@ namespace Traveler.WebApi.Controllers
                         {
                             id = model.Item2.Id,
                             email = model.Item2.Email,
-                            userName = model.Item2.UserName
+                            userName = model.Item2.UserName,
+                            name = model.Item2.Name,
+                            surname = model.Item2.Surname
                         }
                     });
                 }

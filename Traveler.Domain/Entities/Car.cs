@@ -19,6 +19,7 @@ namespace Traveler.Domain.Entities
         public int Fuel { get; set; }
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
+        public bool IsActive { get; set; }
 
         public int BrandId { get; set; }
         public Brand Brand { get; set; }

@@ -50,6 +50,7 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
+                IsActive = true
             };
 
             await _carDal.CreateAsync(car);
@@ -75,6 +76,7 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
+                IsActive = model.IsActive
             };
 
             await _carDal.UpdateAsync(car);

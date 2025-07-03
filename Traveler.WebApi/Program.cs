@@ -23,6 +23,7 @@ builder.Services.AddScoped<IManagementDal, ManagementRepository>();
 builder.Services.AddScoped<IAboutDal, AboutRepository>();
 builder.Services.AddScoped<IBannerDal, BannerRepository>();
 builder.Services.AddScoped<IServiceDal, ServiceRepository>();
+builder.Services.AddScoped<ILocationDal, LocationRepository>();
 
 var app = builder.Build();
 
