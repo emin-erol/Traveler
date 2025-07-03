@@ -1,0 +1,17 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+@await Component.InvokeAsync("_ManagementHeadUILayoutComponentPartial")
+
+<body>
+
+    @RenderBody()
+
+    @await Component.InvokeAsync("_ManagementScriptUILayoutComponentPartial")
+
+</body>
+</html>

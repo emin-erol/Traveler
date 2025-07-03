@@ -1,0 +1,112 @@
+﻿@{
+    ViewData["Title"] = "VerifyModal";
+    Layout = "~/Views/ManagementUILayout/Index.cshtml";
+    var email = ViewBag.Email as string;
+    var message = ViewBag.Message as string;
+}
+
+<div class="middle-box text-center loginscreen animated fadeInDown">
+    <div>
+        <h2 class="my-4"><strong>@message</strong></h2>
+        <p>Lütfen mail adresinize gönderilen doğrulama kodunu giriniz.</p>
+
+        <form id="verifyForm">
+
+            <input type="hidden" id="email" value="@email" />
+
+            <div class="form-group">
+                <label for="verificationCode">Doğrulama Kodu</label>
+                <input type="text" id="verificationCode" class="form-control">
+            </div>
+
+            <button type="submit" class="btn btn-primary block full-width m-b">Kodu Gönder</button>
+            <p class="text-muted text-center"><small>Kodu almadınız mı?</small></p>
+            <button id="resendCodeButton" type="button" class="btn btn-sm btn-white btn-block">Tekrar Kod Al</button>
+
+        </form>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let isDisabled = false;
+
+        $("#verifyForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = {
+                Email: $('#email').val(),
+                VerificationCode: $('#verificationCode').val()
+            };
+
+            console.log('formData:', formData);
+
+            $.ajax({
+                url: "/Management/Verify",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success("Doğrulama kodu onaylandı, giriş sayfasına yönlendiriliyor.");
+                        setTimeout(function () {
+                            window.location.href = response.redirectUrl;
+                        }, 2000);
+                    } else {
+                        toastr.error(response.message, "Hata");
+                    }
+                },
+                error: function () {
+                    toastr.error("Girilen doğrulama kodu hatalı, lütfen tekrar deneyiniz.", "Hata");
+                }
+            });
+
+        });
+
+        $("#resendCodeButton").on("click", function () {
+            if (isDisabled) return;
+
+            isDisabled = true;
+            const button = $(this);
+            const email = "@ViewBag.Email";
+
+            button.addClass("disabled").css({
+                "pointer-events": "none",
+                "cursor": "not-allowed",
+                "opacity": "0.5"
+            }).text("Kod Gönderiliyor...");
+
+            $.ajax({
+                url: "/Management/ChangeVerificationCode",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(email),
+                success: function () {
+                    toastr.success("Doğrulama kodu başarıyla gönderildi.", "Başarılı");
+                },
+                error: function () {
+                    toastr.error("Doğrulama kodu gönderilemedi. Lütfen tekrar deneyin.", "Hata");
+                },
+                complete: function () {
+                    let remainingTime = 60;
+                    const timer = setInterval(function () {
+                        remainingTime--;
+                        button.text(`Tekrar Kod Al (${remainingTime}s)`);
+
+                        if (remainingTime <= 0) {
+                            clearInterval(timer);
+                            button.removeClass("disabled").css({
+                                "pointer-events": "auto",
+                                "cursor": "pointer",
+                                "opacity": "1"
+                            }).text("Tekrar Kod Al");
+                            isDisabled = false;
+                        }
+                    }, 1000);
+                }
+            });
+        });
+    });
+</script>

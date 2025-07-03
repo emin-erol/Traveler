@@ -1,0 +1,6 @@
+@Traveler.WebApi_HostAddress = http://localhost:5258
+
+GET {{Traveler.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
