@@ -9,7 +9,8 @@ namespace Traveler.Domain.Entities
     public class Pricing
     {
         public int PricingId { get; set; }
-        public string PricingName { get; set; }
+        public string PricingType { get; set; }
+        public decimal PricingDec { get; set; }
 
         public List<CarPricing> CarPricings { get; set; }
     }

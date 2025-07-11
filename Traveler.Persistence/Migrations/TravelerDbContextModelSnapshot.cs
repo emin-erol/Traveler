@@ -516,7 +516,10 @@ namespace Traveler.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PricingId"));
 
-                    b.Property<string>("PricingName")
+                    b.Property<decimal>("PricingDec")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PricingType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

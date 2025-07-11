@@ -38,7 +38,8 @@ namespace Traveler.WebApi.Controllers
         {
             var pricing = new Pricing
             {
-                PricingName = model.PricingName,
+                PricingType = model.PricingType,
+                PricingDec = model.PricingDec,
             };
 
             await _pricingDal.CreateAsync(pricing);
@@ -52,7 +53,8 @@ namespace Traveler.WebApi.Controllers
             var pricing = new Pricing
             {
                 PricingId = model.PricingId,
-                PricingName = model.PricingName,
+                PricingType = model.PricingType,
+                PricingDec = model.PricingDec,
             };
 
             await _pricingDal.UpdateAsync(pricing);

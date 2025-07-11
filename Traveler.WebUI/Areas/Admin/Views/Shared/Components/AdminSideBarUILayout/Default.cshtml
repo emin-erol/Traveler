@@ -1,0 +1,87 @@
+﻿@{
+    var userName = ViewBag.UserName;
+}
+
+<div class="vertical-menu">
+    <div data-simplebar class="h-100">
+        <div class="navbar-brand-box">
+            <a href="#" class="logo">
+                <i class="mdi mdi-alpha-x-circle"></i>
+                <span>
+                    PersonalWebSite @userName
+                </span>
+            </a>
+        </div>
+        <div id="sidebar-menu">
+
+            <ul class="metismenu list-unstyled" id="side-menu">
+
+                <li class="menu-title">Menü</li>
+
+                <li><a href="/Admin/MainPage/Index" class="waves-effect"><i class="fas fa-pager"></i><span>Ana Menü</span></a></li>
+                <li><a href="/Default/Index/@userName" class="waves-effect" target="_blank"><i class="fas fa-home"></i><span>Siteye Git</span></a></li>
+                <li><a href="/Admin/Banner/Index/" class="waves-effect"><i class="fas fa-certificate"></i><span>Banner Alanı</span></a></li>
+                <li><a href="/Admin/About/Index/" class="waves-effect"><i class="fas fa-info"></i><span>About Alanı</span></a></li>
+
+                <li>
+                    <a href="javascript:void(0);" class="has-arrow waves-effect">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Resume İşlemleri</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+                        <li><a href="/Admin/ResumeCategory/Index/">Kategoriler</a></li>
+                        <li><a href="/Admin/ResumeCategoryItem/Index/">Kategori Elemanları</a></li>
+                        <li><a href="/Admin/TechIUsed/Index/">Kullanılan Teknolojiler</a></li>
+                    </ul>
+                </li>
+
+                <li><a href="/Admin/Blog/Index/" class="waves-effect"><i class="fa-solid fa-book"></i><span>Bloglar</span></a></li>
+                <li>
+                    <a href="/Admin/ContactMail/Index/" class="waves-effect d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-phone"></i>
+                            <span class="ml-2">Gelen Mailler</span>
+                        </div>
+                        <span class="badge badge-pill badge-info ml-2"></span>
+                    </a>
+                </li>
+                <li><a href="/Admin/ContactInfo/Index/" class="waves-effect"><i class="fas fa-address-card"></i><span>İletişim Bilgileri</span></a></li>
+                <li><a href="/Admin/SocialMedia/Index/" class="waves-effect"><i class="fas fa-tv"></i><span>Sosyal Medya Bilgileri</span></a></li>
+                <li><a href="/Admin/Footer/Index/" class="waves-effect"><i class="fa-solid fa-xmarks-lines"></i><span>Footer İşlemleri</span></a></li>
+                <li>
+                    <a class="waves-effect"
+                       asp-area=""
+                       asp-controller="Management"
+                       asp-action="Logout">
+                        <i class="fas fa-sign-out-alt"></i><span>Çıkış Yap</span>
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    console.log("Kullanıcı Adı: '@userName'");
+    $(document).ready(function () {
+
+        function fetchUnreadMessagesCount() {
+            $.ajax({
+                url: "/Admin/ContactMail/GetNumberOfUnreadMails",
+                type: "GET",
+                success: function (data) {
+                    $(".badge-info").text(data);
+                },
+                error: function () {
+                    console.error("Okunmamış mesaj sayısı alınırken bir hata oluştu.");
+                }
+            });
+        }
+
+        setInterval(fetchUnreadMessagesCount, 1000);
+
+    });
+</script>

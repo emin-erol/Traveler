@@ -8,6 +8,7 @@ namespace Traveler.Application.Dtos.PricingDtos
 {
     public class CreatePricingDto
     {
-        public string PricingName { get; set; }
+        public string PricingType { get; set; }
+        public decimal PricingDec { get; set; }
     }
 }

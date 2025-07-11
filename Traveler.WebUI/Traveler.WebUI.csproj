@@ -60,4 +60,9 @@
     <ProjectReference Include="..\Traveler.ViewModel\Traveler.ViewModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
+    <Folder Include="Areas\Admin\Models\" />
+  </ItemGroup>
+
 </Project>
