@@ -9,6 +9,7 @@ namespace Traveler.Application.Dtos.CarDtos
     public class CreateCarDto
     {
         public string Model { get; set; }
+        public string StockNumber { get; set; }
         public int Year { get; set; }
         public string CoverImageUrl { get; set; }
         public int Mileage { get; set; }

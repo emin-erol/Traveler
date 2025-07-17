@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Traveler.Domain.Entities;
 
 namespace Traveler.Application.Dtos.CarDtos
 {
-    public class UpdateCarDto
+    public class GetCarWithAllDetailsDto
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
@@ -21,7 +22,7 @@ namespace Traveler.Application.Dtos.CarDtos
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
-        public int BrandId { get; set; }
-        public int CarClassId { get; set; }
+        public Brand Brand { get; set; }
+        public CarClass CarClass { get; set; }
     }
 }

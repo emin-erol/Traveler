@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Traveler.Application.Dtos.CarDtos
+namespace Traveler.ViewModel.CarViewModels
 {
-    public class UpdateCarDto
+    public class UpdateCarViewModel
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
@@ -20,7 +20,6 @@ namespace Traveler.Application.Dtos.CarDtos
         public int Fuel { get; set; }
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
-        public int Status { get; set; }
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
     }

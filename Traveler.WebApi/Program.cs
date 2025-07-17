@@ -24,6 +24,12 @@ builder.Services.AddScoped<IAboutDal, AboutRepository>();
 builder.Services.AddScoped<IBannerDal, BannerRepository>();
 builder.Services.AddScoped<IServiceDal, ServiceRepository>();
 builder.Services.AddScoped<ILocationDal, LocationRepository>();
+builder.Services.AddScoped<ICarDal, CarRepository>();
+builder.Services.AddScoped<IPricingDal, PricingRepository>();
+builder.Services.AddScoped<IFeatureDal, FeatureRepository>();
+builder.Services.AddScoped<ICarClassDal, CarClassRepository>();
+builder.Services.AddScoped<ICarFeatureDal, CarFeatureRepository>();
+builder.Services.AddScoped<IBrandDal, BrandRepository>();
 
 var app = builder.Build();
 

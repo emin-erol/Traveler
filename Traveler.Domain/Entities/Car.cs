@@ -9,6 +9,7 @@ namespace Traveler.Domain.Entities
     public class Car
     {
         public int CarId { get; set; }
+        public string StockNumber { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
         public string CoverImageUrl { get; set; }
@@ -19,7 +20,7 @@ namespace Traveler.Domain.Entities
         public int Fuel { get; set; }
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
-        public bool IsActive { get; set; }
+        public int Status { get; set; }
 
         public int BrandId { get; set; }
         public Brand Brand { get; set; }

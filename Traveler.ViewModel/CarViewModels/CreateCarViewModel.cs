@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Traveler.ViewModel.BrandViewModels;
+using Traveler.ViewModel.CarClassViewModels;
 
-namespace Traveler.Application.Dtos.CarDtos
+namespace Traveler.ViewModel.CarViewModels
 {
-    public class UpdateCarDto
+    public class CreateCarViewModel
     {
-        public int CarId { get; set; }
         public string StockNumber { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
@@ -20,7 +21,6 @@ namespace Traveler.Application.Dtos.CarDtos
         public int Fuel { get; set; }
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
-        public int Status { get; set; }
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
     }

@@ -1,0 +1,58 @@
+﻿@model GetCarWithAllDetailsViewModel
+
+@{
+    ViewData["Title"] = "Araç Detay";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg" style="margin-top: 100px;">
+        <div class="row g-0">
+            <div class="col-md-6">
+                <img src="@Model.BigImageUrl" alt="Araç Resmi" class="img-fluid rounded-start w-100 h-100 object-fit-cover" style="max-height: 500px;">
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h3 class="card-title text-primary">@Model.Brand.Name @Model.Model</h3>
+                    <p class="card-text"><strong>Stok No:</strong> @Model.StockNumber</p>
+                    <p class="card-text"><strong>Sınıf:</strong> @Model.CarClass.ClassName</p>
+                    <p class="card-text"><strong>Model Yılı:</strong> @Model.Year</p>
+                    
+                    <p class="card-text"><strong>KM:</strong> @Model.Mileage.ToString("N0") km</p>
+
+                    <p class="card-text">
+                        <strong>Vites:</strong> @(((TransmissionEnum)Model.Transmission).ToString())
+                    </p>
+
+                    <p class="card-text">
+                        <strong>Yakıt Türü:</strong> @(((FuelEnum)Model.Fuel).ToString())
+                    </p>
+
+                    <p class="card-text"><strong>Koltuk Sayısı:</strong> @Model.Seat Koltuk</p>
+                    <p class="card-text"><strong>Bagaj:</strong> @Model.Luggage Valiz</p>
+                    <p class="card-text">
+                        <strong>Durum:</strong>
+                        @{
+                            var status = (StatusEnum)Model.Status;
+                            var badgeClass = status switch
+                            {
+                                StatusEnum.Müsait => "bg-success",
+                                StatusEnum.Kullanımda => "bg-warning text-dark",
+                                StatusEnum.Serviste => "bg-info text-dark",
+                                StatusEnum.Kullanılamaz => "bg-danger",
+                                _ => "bg-secondary"
+                            };
+                        }
+                        <span class="badge @badgeClass">@status.ToString()</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer mt-4">
+            <h5>Araç Açıklaması</h5>
+            <p>@Model.Description</p>
+        </div>
+    </div>
+</div>

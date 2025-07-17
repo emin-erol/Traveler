@@ -33,6 +33,22 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
+        [HttpGet("GetCarsWithBrandAndClass")]
+        public async Task<IActionResult> GetCarsWithBrandAndClass()
+        {
+            var values = await _carDal.GetCarsWithBrandAndClass();
+
+            return Ok(values);
+        }
+
+        [HttpGet("GetCarWithAllDetails/{carId}")]
+        public async Task<IActionResult> GetCarWithAllDetails(int carId)
+        {
+            var value = await _carDal.GetCarWithAllDetails(carId);
+
+            return Ok(value);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCar(CreateCarDto model)
         {
@@ -40,6 +56,7 @@ namespace Traveler.WebApi.Controllers
             {
                 BigImageUrl = model.BigImageUrl,
                 BrandId = model.BrandId,
+                StockNumber = model.StockNumber,
                 CarClassId = model.CarClassId,
                 CoverImageUrl = model.CoverImageUrl,
                 Description = model.Description,
@@ -50,7 +67,7 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
-                IsActive = true
+                Status = 1
             };
 
             await _carDal.CreateAsync(car);
@@ -69,6 +86,7 @@ namespace Traveler.WebApi.Controllers
                 CarClassId = model.CarClassId,
                 CoverImageUrl = model.CoverImageUrl,
                 Description = model.Description,
+                StockNumber = model.StockNumber,
                 Fuel = model.Fuel,
                 Luggage = model.Luggage,
                 Mileage = model.Mileage,
@@ -76,7 +94,7 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
-                IsActive = model.IsActive
+                Status = model.Status
             };
 
             await _carDal.UpdateAsync(car);

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Traveler.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Traveler.Persistence.Context;
 namespace Traveler.Persistence.Migrations
 {
     [DbContext(typeof(TravelerDbContext))]
-    partial class TravelerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250711211255_addedStockNumberColumnToCar")]
+    partial class addedStockNumberColumnToCar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -345,6 +348,9 @@ namespace Traveler.Persistence.Migrations
                     b.Property<int>("Fuel")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<byte>("Luggage")
                         .HasColumnType("tinyint");
 
@@ -358,12 +364,8 @@ namespace Traveler.Persistence.Migrations
                     b.Property<byte>("Seat")
                         .HasColumnType("tinyint");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StockNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("StockNumber")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Transmission")
                         .HasColumnType("int");
