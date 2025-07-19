@@ -24,5 +24,6 @@ namespace Traveler.Application.Dtos.CarDtos
         public int Status { get; set; }
         public Brand Brand { get; set; }
         public CarClass CarClass { get; set; }
+        public List<string> FeatureNames { get; set; }
     }
 }

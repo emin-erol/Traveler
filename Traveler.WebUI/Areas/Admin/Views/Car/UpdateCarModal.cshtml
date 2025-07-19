@@ -1,5 +1,6 @@
 ﻿@using Traveler.ViewModel.BrandViewModels
 @using Traveler.ViewModel.CarClassViewModels
+@using Traveler.ViewModel.CarFeatureViewModels
 @model UpdateCarViewModel
 
 @{
@@ -23,6 +24,15 @@
         .Cast<TransmissionEnum>()
         .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
         .ToList();
+
+    var statusList = Enum.GetValues(typeof(StatusEnum))
+        .Cast<StatusEnum>()
+        .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
+        .ToList();
+
+    var selectedFeatureIds = (ViewBag.CarFeatures as List<ResultCarFeatureViewModel>)?
+        .Select(cf => cf.FeatureId)
+        .ToList() ?? new List<int>();
 }
 
 <div class="page-content">
@@ -129,6 +139,39 @@
                                     <select asp-for="Transmission" asp-items="transmissionList" class="form-select">
                                         <option disabled value="">Vites Türü Seçin</option>
                                     </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="Status" class="col-sm-3 col-form-label text-end">Durumu</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="Status" asp-items="statusList" class="form-select">
+                                        <option disabled value="">Aracın durumunu seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label class="col-sm-3 col-form-label text-end">Araç Özellikleri</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        @foreach (var feature in ViewBag.Features as List<ResultFeatureViewModel>)
+                                        {
+                                            <div class="col-md-3 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           name="SelectedFeatureIds"
+                                                           value="@feature.FeatureId"
+                                                           id="feature_@feature.FeatureId"
+                                                           @(selectedFeatureIds.Contains(feature.FeatureId) ? "checked" : "") />
+                                                    <label class="form-check-label" for="feature_@feature.FeatureId">
+                                                        @feature.FeatureName
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
 

@@ -67,12 +67,12 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
-                Status = 1
+                Status = model.Status
             };
 
             await _carDal.CreateAsync(car);
 
-            return Ok("Car information has been created.");
+            return Ok(car);
         }
 
         [HttpPut]

@@ -21,7 +21,9 @@ namespace Traveler.ViewModel.CarViewModels
         public int Fuel { get; set; }
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
+        public int Status { get; set; }
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
+        public List<int> SelectedFeatureIds { get; set; }
     }
 }

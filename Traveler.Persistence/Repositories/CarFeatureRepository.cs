@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Traveler.Application.Dtos.CarFeatureDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
 using Traveler.Persistence.Context;
@@ -11,8 +13,10 @@ namespace Traveler.Persistence.Repositories
 {
     public class CarFeatureRepository : GenericRepository<CarFeature>, ICarFeatureDal
     {
+        private readonly TravelerDbContext _context;
         public CarFeatureRepository(TravelerDbContext context) : base(context)
         {
+            _context = context;
         }
 
         public async Task CreateAsync(CarFeature entity)
@@ -38,6 +42,22 @@ namespace Traveler.Persistence.Repositories
         public async Task UpdateAsync(CarFeature entity)
         {
             await base.UpdateAsync(entity);
+        }
+
+        public async Task<List<CarFeatureDto>> GetCarFeaturesByCarId(int carId)
+        {
+            var carFeatures = await _context.CarFeatures
+                .Where(cf => cf.CarId == carId)
+                .Select(cf => new CarFeatureDto
+                {
+                    CarFeatureId = cf.CarFeatureId,
+                    Available = cf.Available,
+                    CarId = cf.CarId,
+                    FeatureId = cf.FeatureId
+                })
+                .ToListAsync();
+
+            return carFeatures;
         }
     }
 }

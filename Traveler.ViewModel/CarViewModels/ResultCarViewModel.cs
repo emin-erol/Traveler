@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Traveler.ViewModel.CarViewModels
 {
-    public class UpdateCarViewModel
+    public class ResultCarViewModel
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
@@ -23,6 +23,5 @@ namespace Traveler.ViewModel.CarViewModels
         public int Status { get; set; }
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
-        public List<int> SelectedFeatureIds { get; set; }
     }
 }

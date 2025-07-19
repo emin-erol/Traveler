@@ -1,0 +1,33 @@
+﻿@model CreateFeatureViewModel
+
+@{
+    ViewData["Title"] = "CreateFeatureModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni Özellik Oluştur</h4>
+                        <p class="card-subtitle mb-4">
+                            Eklemek istediğiniz yeni özellik bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="CreateFeature" asp-controller="Feature">
+
+                            <div class="form-group">
+                                <label for="featureName">Özellik Adı</label>
+                                <input type="text" class="form-control" id="featureName" asp-for="FeatureName" placeholder="Özellik adını giriniz" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Özelliği Kaydet</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

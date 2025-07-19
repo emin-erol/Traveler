@@ -127,6 +127,42 @@
                                 </div>
                             </div>
 
+                            <div class="row mb-3">
+                                <label asp-for="Status" class="col-sm-3 col-form-label text-end">Durumu</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="Status" class="form-select">
+                                        <option disabled selected value="">Aracın durumunu seçin</option>
+                                        @foreach (StatusEnum status in Enum.GetValues(typeof(StatusEnum)))
+                                        {
+                                            <option value="@( (int)status )">@status</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label class="col-sm-3 col-form-label text-end">Araç Özellikleri</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        @foreach (var feature in ViewBag.Features as List<ResultFeatureViewModel>)
+                                        {
+                                            <div class="col-md-3 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           name="SelectedFeatureIds"
+                                                           value="@feature.FeatureId"
+                                                           id="feature_@feature.FeatureId" />
+                                                    <label class="form-check-label" for="feature_@feature.FeatureId">
+                                                        @feature.FeatureName
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row mb-4">
                                 <label asp-for="Description" class="col-sm-3 col-form-label text-end">Açıklama</label>
                                 <div class="col-sm-9">

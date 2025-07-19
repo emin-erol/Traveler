@@ -71,6 +71,11 @@ namespace Traveler.Persistence.Repositories
                 .Include(c => c.CarClass)
                 .FirstOrDefaultAsync(c => c.CarId == carId);
 
+            var featureNames = await _context.CarFeatures
+                .Where(cf => cf.CarId == carId)
+                .Select(cf => cf.Feature.FeatureName)
+                .ToListAsync();
+
             if (car == null)
                 return null!;
 
@@ -89,6 +94,7 @@ namespace Traveler.Persistence.Repositories
                 BigImageUrl = car.BigImageUrl,
                 Description = car.Description,
                 Status = car.Status,
+                FeatureNames = featureNames,
                 Brand = new Brand
                 {
                     BrandId = car.Brand.BrandId,

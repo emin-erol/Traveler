@@ -25,5 +25,6 @@ namespace Traveler.ViewModel.CarViewModels
         public int Status { get; set; }
         public ResultBrandViewModel Brand { get; set; }
         public ResultCarClassViewModel CarClass { get; set; }
+        public List<string> FeatureNames { get; set; }
     }
 }
