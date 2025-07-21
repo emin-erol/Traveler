@@ -5,6 +5,14 @@
 @{
     ViewData["Title"] = "Yeni Araç Ekle";
     Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
+}
+
+@functions {
+    public string GetPricingTypeName(int pricingType)
+    {
+        return Enum.GetName(typeof(PricingTypeEnum), pricingType)!;
+    }
 }
 
 <div class="page-content">
@@ -18,7 +26,7 @@
                             Lütfen araç bilgilerini eksiksiz giriniz.
                         </p>
 
-                        <form asp-action="CreateCar" asp-controller="Car" method="post">
+                        <form id="createCarForm">
                             <div class="row mb-3">
                                 <label asp-for="StockNumber" class="col-sm-3 col-form-label text-end">Stok No</label>
                                 <div class="col-sm-9">
@@ -164,6 +172,26 @@
                             </div>
 
                             <div class="row mb-4">
+                                <label class="col-sm-3 col-form-label text-end">Fiyatlandırma Bilgileri</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        @foreach (var pricing in pricings!)
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">
+                                                    @pricing.Quantity @GetPricingTypeName(pricing.PricingType)
+                                                </label>
+                                                <input type="number"
+                                                       class="form-control pricing-input"
+                                                       data-pricing-id="@pricing.PricingId"
+                                                       placeholder="Fiyat girin" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
                                 <label asp-for="Description" class="col-sm-3 col-form-label text-end">Açıklama</label>
                                 <div class="col-sm-9">
                                     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
@@ -183,3 +211,66 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#createCarForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const dto = {};
+            $("#createCarForm")
+                .find("input[name], select[name], textarea[name]")
+                .each(function () {
+                const name = $(this).attr("name");
+                const type = $(this).attr("type");
+                if (type === "checkbox") {
+                    if ($(this).is(":checked")) {
+                        if (!dto[name]) {
+                            dto[name] = [];
+                        }
+                        dto[name].push(parseInt($(this).val()));
+                    }
+                } else {
+                    dto[name] = $(this).val();
+                }
+            });
+
+            const cpDtos = [];
+            $(".pricing-input").each(function () {
+                const pricingId = $(this).data("pricing-id");
+                const amount = parseFloat($(this).val());
+
+                if (!isNaN(amount) && amount > 0) {
+                    cpDtos.push({
+                        pricingId: pricingId,
+                        amount: amount,
+                        carId: 0
+                    });
+                }
+            });
+
+            const model = {
+                dto: dto,
+                cpDtos: cpDtos
+            };
+
+            $.ajax({
+                url: "/Admin/Car/CreateCar",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(model),
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        alert("İşlem başarısız: " + (response.message || "Bilinmeyen hata"));
+                    }
+                },
+                error: function () {
+                    alert("Sunucu hatası oluştu.");
+                }
+            });
+        });
+
+    });
+</script>

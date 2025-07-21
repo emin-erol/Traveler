@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Traveler.Application.Dtos.PricingDtos
+namespace Traveler.ViewModel.PricingViewModels
 {
-    public class CreatePricingDto
+    public class ResultPricingViewModel
     {
+        public int PricingId { get; set; }
         public int PricingType { get; set; }
         public int Quantity { get; set; }
     }

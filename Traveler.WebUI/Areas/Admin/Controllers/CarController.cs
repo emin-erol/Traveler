@@ -4,8 +4,10 @@ using System.Text;
 using Traveler.ViewModel.BrandViewModels;
 using Traveler.ViewModel.CarClassViewModels;
 using Traveler.ViewModel.CarFeatureViewModels;
+using Traveler.ViewModel.CarPricingViewModels;
 using Traveler.ViewModel.CarViewModels;
 using Traveler.ViewModel.FeatureViewModels;
+using Traveler.ViewModel.PricingViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
 {
@@ -65,22 +67,27 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
             var brandResponse = await client.GetAsync("https://localhost:7252/api/Brands");
             var carClassResponse = await client.GetAsync("https://localhost:7252/api/CarClasses");
             var featuresResponse = await client.GetAsync("https://localhost:7252/api/Features");
+            var pricingsResponse = await client.GetAsync("https://localhost:7252/api/Pricings");
 
             if (brandResponse.IsSuccessStatusCode &&
                 carClassResponse.IsSuccessStatusCode &&
-                featuresResponse.IsSuccessStatusCode)
+                featuresResponse.IsSuccessStatusCode &&
+                pricingsResponse.IsSuccessStatusCode)
             {
                 var brandJson = await brandResponse.Content.ReadAsStringAsync();
                 var carClassJson = await carClassResponse.Content.ReadAsStringAsync();
                 var featuresJson = await featuresResponse.Content.ReadAsStringAsync();
+                var pricingsJson = await pricingsResponse.Content.ReadAsStringAsync();
 
                 var brandValues = JsonConvert.DeserializeObject<List<ResultBrandViewModel>>(brandJson);
                 var carClassValues = JsonConvert.DeserializeObject<List<ResultCarClassViewModel>>(carClassJson);
                 var featuresValues = JsonConvert.DeserializeObject<List<ResultFeatureViewModel>>(featuresJson);
+                var pricingsValues = JsonConvert.DeserializeObject<List<ResultPricingViewModel>>(pricingsJson);
 
                 ViewBag.Brands = brandValues;
                 ViewBag.CarClasses = carClassValues;
                 ViewBag.Features = featuresValues;
+                ViewBag.Pricings = pricingsValues;
 
                 return View();
             }
@@ -89,9 +96,12 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("CreateContactInfoModal")]
-        public async Task<IActionResult> CreateCar(CreateCarViewModel dto)
+        [Route("CreateCar")]
+        public async Task<IActionResult> CreateCar([FromBody] CreateCarRequestViewModel request)
         {
+            var dto = request.Dto;
+            var cpDtos = request.CpDtos;
+
             var client = _httpClientFactory.CreateClient();
 
             var jsonData = JsonConvert.SerializeObject(dto);
@@ -111,21 +121,39 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 {
                     foreach (var featureId in dto.SelectedFeatureIds)
                     {
-                        var carFeatureDto = new
+                        var createCarFeatureViewModel = new
                         {
                             CarId = newCarId,
                             FeatureId = featureId,
                             Available = true
                         };
 
-                        var featureJson = JsonConvert.SerializeObject(carFeatureDto);
+                        var featureJson = JsonConvert.SerializeObject(createCarFeatureViewModel);
                         var featureContent = new StringContent(featureJson, Encoding.UTF8, "application/json");
 
                         await client.PostAsync("https://localhost:7252/api/CarFeatures", featureContent);
                     }
                 }
 
-                return RedirectToAction("Index", "Car");
+                if (cpDtos != null)
+                {
+                    foreach(var cpDto in cpDtos)
+                    {
+                        var createCarPricingViewModel = new
+                        {
+                            CarId = newCarId,
+                            PricingId = cpDto.PricingId,
+                            Amount = cpDto.Amount,
+                        };
+
+                        var pricingJson = JsonConvert.SerializeObject(createCarPricingViewModel);
+                        var pricingContent = new StringContent(pricingJson, Encoding.UTF8, "application/json");
+
+                        await client.PostAsync("https://localhost:7252/api/CarPricings", pricingContent);
+                    }
+                }
+
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Car") });
             }
 
             return View("CreateCarModal", dto);
@@ -173,6 +201,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [Route("UpdateCarModal")]
         public async Task<IActionResult> UpdateCar(UpdateCarViewModel dto)
         {
             var client = _httpClientFactory.CreateClient();

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Traveler.Application.Dtos.PricingDtos
+namespace Traveler.ViewModel.CarPricingViewModels
 {
-    public class UpdatePricingDto
+    public class CreateCarPricingViewModel
     {
+        public decimal Amount { get; set; }
+        public int CarId { get; set; }
         public int PricingId { get; set; }
-        public int PricingType { get; set; }
-        public int Quantity { get; set; }
     }
 }

@@ -22,6 +22,7 @@
                 <li><a href="/Home/Index/@userName" class="waves-effect" target="_blank"><i class="fas fa-home"></i><span>Siteye Git</span></a></li>
                 <li><a href="/Admin/Car/Index/" class="waves-effect"><i class="fas fa-certificate"></i><span>Araçlar</span></a></li>
                 <li><a href="/Admin/Feature/Index/" class="waves-effect"><i class="fas fa-certificate"></i><span>Özellikler</span></a></li>
+                <li><a href="/Admin/Pricing/Index/" class="waves-effect"><i class="fas fa-certificate"></i><span>Fiyatlandırma</span></a></li>
                 <li><a href="/Admin/About/Index/" class="waves-effect"><i class="fas fa-info"></i><span>About Alanı</span></a></li>
 
                 <li>
@@ -63,26 +64,3 @@
         </div>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    console.log("Kullanıcı Adı: '@userName'");
-    $(document).ready(function () {
-
-        function fetchUnreadMessagesCount() {
-            $.ajax({
-                url: "/Admin/ContactMail/GetNumberOfUnreadMails",
-                type: "GET",
-                success: function (data) {
-                    $(".badge-info").text(data);
-                },
-                error: function () {
-                    console.error("Okunmamış mesaj sayısı alınırken bir hata oluştu.");
-                }
-            });
-        }
-
-        setInterval(fetchUnreadMessagesCount, 1000);
-
-    });
-</script>

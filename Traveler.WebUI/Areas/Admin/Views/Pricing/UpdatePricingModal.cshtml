@@ -1,0 +1,57 @@
+﻿@model UpdatePricingViewModel
+
+@{
+    ViewData["Title"] = "UpdatePricingModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+
+    var pricingTypeList = Enum.GetValues(typeof(PricingTypeEnum))
+        .Cast<PricingTypeEnum>()
+        .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
+        .ToList();
+}
+
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni Araç Ekle</h4>
+                        <p class="card-subtitle mb-4">
+                            Lütfen fiyatlandırma bilgilerini eksiksiz güncelleyiniz.
+                        </p>
+
+                        <form asp-action="UpdatePricing" asp-controller="Pricing" method="post">
+
+                            <input type="hidden" asp-for="PricingId" />
+
+                            <div class="row mb-3">
+                                <label asp-for="Quantity" class="col-sm-3 col-form-label text-end">Birim Süre</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Quantity" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="PricingType" class="col-sm-3 col-form-label text-end">Fiyatlandırma Türü</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="PricingType" asp-items="pricingTypeList" class="form-select">
+                                        <option disabled value="">Fiyatlandırma türü seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="offset-sm-3 col-sm-9 text-end">
+                                    <button type="submit" class="btn btn-success">Güncelle</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

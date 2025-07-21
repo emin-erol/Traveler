@@ -1,0 +1,52 @@
+﻿@model CreatePricingViewModel
+
+@{
+    ViewData["Title"] = "CreatePricingModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni Araç Ekle</h4>
+                        <p class="card-subtitle mb-4">
+                            Lütfen fiyatlandırma bilgilerini eksiksiz giriniz.
+                        </p>
+
+                        <form asp-action="CreatePricing" asp-controller="Pricing" method="post">
+                            <div class="row mb-3">
+                                <label asp-for="Quantity" class="col-sm-3 col-form-label text-end">Birim Süre</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Quantity" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="PricingType" class="col-sm-3 col-form-label text-end">Fiyatlandırma Türü</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="PricingType" class="form-select">
+                                        <option disabled selected value="">Fiyatlandırma türünü seçin</option>
+                                        @foreach (PricingTypeEnum type in Enum.GetValues(typeof(PricingTypeEnum)))
+                                        {
+                                            <option value="@( (int)type )">@type</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="offset-sm-3 col-sm-9 text-end">
+                                    <button type="submit" class="btn btn-success">Kaydet</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

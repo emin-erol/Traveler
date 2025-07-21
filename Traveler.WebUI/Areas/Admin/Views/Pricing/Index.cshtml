@@ -1,0 +1,60 @@
+﻿@model List<ResultPricingViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+    int count = 0;
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Araçlar</h4>
+                        <p class="card-subtitle mb-4">
+                            Fiyat Tipleri ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Birim Süre</th>
+                                        <th>Fiyatlandırma Türü</th>
+                                        <th>Sil</th>
+                                        <th>Güncelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        count++;
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.Quantity</td>
+                                            <td>@(((PricingTypeEnum)item.PricingType).ToString())</td>
+                                            <td>
+                                                <a href="/Admin/Pricing/RemovePricing/@item.PricingId" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/Pricing/UpdatePricingModal/@item.PricingId" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <a href="/Admin/Pricing/CreatePricingModal" class="m-3 btn btn-outline-primary">Fiyatlandırma Ekle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

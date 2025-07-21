@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +9,8 @@ namespace Traveler.Domain.Entities
     public class Pricing
     {
         public int PricingId { get; set; }
-        public string PricingType { get; set; }
-        public decimal PricingDec { get; set; }
+        public int PricingType { get; set; }
+        public int Quantity { get; set; }
 
         public List<CarPricing> CarPricings { get; set; }
     }

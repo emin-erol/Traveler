@@ -26,6 +26,7 @@ builder.Services.AddScoped<IServiceDal, ServiceRepository>();
 builder.Services.AddScoped<ILocationDal, LocationRepository>();
 builder.Services.AddScoped<ICarDal, CarRepository>();
 builder.Services.AddScoped<IPricingDal, PricingRepository>();
+builder.Services.AddScoped<ICarPricingDal, CarPricingRepository>();
 builder.Services.AddScoped<IFeatureDal, FeatureRepository>();
 builder.Services.AddScoped<ICarClassDal, CarClassRepository>();
 builder.Services.AddScoped<ICarFeatureDal, CarFeatureRepository>();
