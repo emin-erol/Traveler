@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Text;
 using Traveler.ViewModel.BrandViewModels;
@@ -169,30 +171,40 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
             var brandResponse = await client.GetAsync("https://localhost:7252/api/Brands");
             var carClassResponse = await client.GetAsync("https://localhost:7252/api/CarClasses");
             var featuresResponse = await client.GetAsync("https://localhost:7252/api/Features");
+            var pricingsResponse = await client.GetAsync("https://localhost:7252/api/Pricings");
             var carFeaturesResponse = await client.GetAsync("https://localhost:7252/api/CarFeatures/GetCarFeaturesByCarId/" + carId);
+            var carPricingsResponse = await client.GetAsync("https://localhost:7252/api/CarPricings/GetCarPricingsByCarId/" + carId);
 
             if (carResponse.IsSuccessStatusCode &&
                 brandResponse.IsSuccessStatusCode &&
                 carClassResponse.IsSuccessStatusCode &&
                 featuresResponse.IsSuccessStatusCode &&
-                carFeaturesResponse.IsSuccessStatusCode)
+                carFeaturesResponse.IsSuccessStatusCode &&
+                carPricingsResponse.IsSuccessStatusCode &&
+                pricingsResponse.IsSuccessStatusCode)
             {
                 var carJson = await carResponse.Content.ReadAsStringAsync();
                 var brandJson = await brandResponse.Content.ReadAsStringAsync();
                 var carClassJson = await carClassResponse.Content.ReadAsStringAsync();
                 var featuresJson = await featuresResponse.Content.ReadAsStringAsync();
+                var pricingsJson = await pricingsResponse.Content.ReadAsStringAsync();
                 var carFeaturesJson = await carFeaturesResponse.Content.ReadAsStringAsync();
+                var carPricingsJson = await carPricingsResponse.Content.ReadAsStringAsync();
 
                 var carValue = JsonConvert.DeserializeObject<UpdateCarViewModel>(carJson);
                 var brandValues = JsonConvert.DeserializeObject<List<ResultBrandViewModel>>(brandJson);
                 var carClassValues = JsonConvert.DeserializeObject<List<ResultCarClassViewModel>>(carClassJson);
                 var featuresValues = JsonConvert.DeserializeObject<List<ResultFeatureViewModel>>(featuresJson);
+                var pricingsValues = JsonConvert.DeserializeObject<List<ResultPricingViewModel>>(pricingsJson);
                 var carFeaturesValues = JsonConvert.DeserializeObject<List<ResultCarFeatureViewModel>>(carFeaturesJson);
+                var carPricingsValues = JsonConvert.DeserializeObject<List<ResultCarPricingViewModel>>(carPricingsJson);
 
                 ViewBag.Brands = brandValues;
                 ViewBag.CarClasses = carClassValues;
                 ViewBag.Features = featuresValues;
+                ViewBag.Pricings = pricingsValues;
                 ViewBag.CarFeatures = carFeaturesValues;
+                ViewBag.CarPricings = carPricingsValues;
 
                 return View(carValue);
             }
@@ -201,9 +213,12 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Route("UpdateCarModal")]
-        public async Task<IActionResult> UpdateCar(UpdateCarViewModel dto)
+        [Route("UpdateCar")]
+        public async Task<IActionResult> UpdateCar([FromBody] UpdateCarRequestViewModel request)
         {
+            var dto = request.Dto;
+            var cpDtos = request.CpDtos;
+
             var client = _httpClientFactory.CreateClient();
 
             var jsonData = JsonConvert.SerializeObject(dto);
@@ -247,7 +262,18 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                     }
                 }
 
-                return RedirectToAction("Index", "Car");
+                if (!cpDtos.IsNullOrEmpty())
+                {
+                    foreach( var cp in  cpDtos)
+                    {
+                        var cpJson = JsonConvert.SerializeObject(cp);
+                        StringContent cpContent = new StringContent(cpJson, Encoding.UTF8, "application/json");
+
+                        await client.PutAsync("https://localhost:7252/api/CarPricings/", cpContent);
+                    }
+                }
+
+                return Json(new { success = true, redirectUrl = Url.Action("Index", "Car") });
             }
 
             return View("CreateCarModal", dto);

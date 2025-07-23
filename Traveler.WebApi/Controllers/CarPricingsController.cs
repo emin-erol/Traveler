@@ -31,6 +31,14 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
+        [HttpGet("GetCarPricingsByCarId/{carId}")]
+        public async Task<IActionResult> GetCarPricingsByCarId(int carId)
+        {
+            var values = await _carPricingDal.GetCarPricingsByCarId(carId);
+
+            return Ok(values);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCarPricing(CreateCarPricingDto model)
         {

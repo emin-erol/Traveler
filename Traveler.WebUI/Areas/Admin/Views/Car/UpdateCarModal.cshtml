@@ -33,6 +33,16 @@
     var selectedFeatureIds = (ViewBag.CarFeatures as List<ResultCarFeatureViewModel>)?
         .Select(cf => cf.FeatureId)
         .ToList() ?? new List<int>();
+
+    var carPricings = ViewBag.CarPricings as List<ResultCarPricingViewModel>;
+    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
+}
+
+@functions {
+    public string GetPricingTypeName(int pricingType)
+    {
+        return Enum.GetName(typeof(PricingTypeEnum), pricingType)!;
+    }
 }
 
 <div class="page-content">
@@ -176,6 +186,34 @@
                             </div>
 
                             <div class="row mb-4">
+                                <label class="col-sm-3 col-form-label text-end">Fiyatlandırma Bilgileri</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        @foreach (var pricing in pricings!)
+                                        {
+                                            var carPricing = carPricings?.FirstOrDefault(cp => cp.PricingId == pricing.PricingId)!;
+                                            
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">
+                                                    @pricing.Quantity @GetPricingTypeName(pricing.PricingType) Fiyatı
+                                                </label>
+                                                <div class="input-group">
+                                                    <input type="number"
+                                                           class="form-control pricing-input"
+                                                           data-id="@carPricing.CarPricingId"
+                                                           data-pricing-id ="@pricing.PricingId"
+                                                           data-car-id ="@Model.CarId"
+                                                           value="@(carPricing?.Amount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) ?? "0")"
+                                                           placeholder="0" />
+                                                    <span class="input-group-text">TL</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
                                 <label asp-for="Description" class="col-sm-3 col-form-label text-end">Açıklama</label>
                                 <div class="col-sm-9">
                                     <textarea asp-for="Description" class="form-control" rows="4"></textarea>
@@ -195,3 +233,69 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        const originalValues = {};
+
+        $(".pricing-input").each(function () {
+            const carPricingId = $(this).data("id");
+            const amount = parseFloat($(this).val()) || 0;
+            originalValues[carPricingId] = amount;
+        });
+
+        $("form").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const dto = {};
+
+            formData.forEach((value, key) => {
+                if (key === "SelectedFeatureIds") {
+                    if (!dto[key]) dto[key] = [];
+                    dto[key].push(parseInt(value));
+                } else {
+                    dto[key] = value;
+                }
+            });
+
+            const cpDtos = [];
+            $(".pricing-input").each(function () {
+                const carPricingId = $(this).data("id");
+                const pricingId = $(this).data("pricing-id");
+                const carId = $(this).data("car-id");
+                const newAmount = parseFloat($(this).val()) || 0;
+                const oldAmount = originalValues[carPricingId];
+
+                if (newAmount !== oldAmount) {
+                    cpDtos.push({
+                        carPricingId: carPricingId,
+                        amount: newAmount,
+                        pricingId: pricingId,
+                        carId: carId
+                    });
+                }
+            });
+
+            const model = {
+                dto: dto,
+                cpDtos: cpDtos
+            };
+
+            console.log("Gönderilen model:", model);
+
+            $.ajax({
+                url: "/Admin/Car/UpdateCar",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(model),
+                success: function () {
+                    window.location.href = "/Admin/Car/Index";
+                },
+                error: function (xhr) {
+                    console.error("Hata:", xhr);
+                }
+            });
+        });
+    });
+</script>

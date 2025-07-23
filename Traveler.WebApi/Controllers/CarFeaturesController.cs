@@ -32,7 +32,7 @@ namespace Traveler.WebApi.Controllers
         }
 
         [HttpGet("GetCarFeaturesByCarId/{carId}")]
-        public async Task<IActionResult> GetCarFeaturesByCar(int carId)
+        public async Task<IActionResult> GetCarFeaturesByCarId(int carId)
         {
             var values = await _carFeatureDal.GetCarFeaturesByCarId(carId);
 
