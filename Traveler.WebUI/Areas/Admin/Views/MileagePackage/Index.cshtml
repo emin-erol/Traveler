@@ -1,4 +1,4 @@
-﻿@model List<ResultFeatureViewModel>
+﻿@model List<ResultMileagePackageViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,16 +12,19 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Araçlar</h4>
+                        <h4 class="card-title">Kilometre Paketleri</h4>
                         <p class="card-subtitle mb-4">
-                            Araçlar ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                            Kilometre paketleri ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
                         </p>
                         <div class="table-responsive">
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Özellik Adı</th>
+                                        <th>Paket Adı</th>
+                                        <th>Kilometre Limiti</th>
+                                        <th>Fiyat</th>
+                                        <th>Açıklama</th>
                                         <th>Sil</th>
                                         <th>Güncelle</th>
                                     </tr>
@@ -32,14 +35,17 @@
                                         count++;
                                         <tr>
                                             <td>@count</td>
-                                            <td>@item.FeatureName</td>
+                                            <td>@item.PackageName</td>
+                                            <td>@(item.PackageLimit == int.MaxValue ? "Sınırsız" : item.PackageLimit.ToString()) km</td>
+                                            <td>@item.Amount TL</td>
+                                            <td>@item.Description</td>
                                             <td>
-                                                <a href="/Admin/Feature/RemoveFeature/@item.FeatureId" class="btn btn-sm btn-danger">
+                                                <a href="/Admin/MileagePackage/RemoveMileagePackage/@item.MileagePackageId" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </td>
                                             <td>
-                                                <a href="/Admin/Feature/UpdateFeatureModal/@item.FeatureId" class="btn btn-sm btn-info">
+                                                <a href="/Admin/MileagePackage/UpdateMileagePackageModal/@item.MileagePackageId" class="btn btn-sm btn-info">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </td>
@@ -48,7 +54,7 @@
                                 </tbody>
                             </table>
 
-                            <a href="/Admin/Feature/CreateFeatureModal" class="m-3 btn btn-outline-primary">Özellik Ekle</a>
+                            <a href="/Admin/MileagePackage/CreateMileagePackageModal" class="m-3 btn btn-outline-primary">Kilometre Paketi Ekle</a>
                         </div>
                     </div>
                 </div>

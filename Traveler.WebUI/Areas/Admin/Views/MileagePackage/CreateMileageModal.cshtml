@@ -1,0 +1,89 @@
+﻿@model CreateMileagePackageViewModel
+
+@{
+    ViewData["Title"] = "CreateMileageModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<style>
+    input:disabled {
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni Kilometre Paketi Oluştur</h4>
+                        <p class="card-subtitle mb-4">
+                            Eklemek istediğiniz yeni kilometre paketi bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="CreateMileagePackage" asp-controller="MileagePackage">
+
+                            <div class="form-group">
+                                <label for="packageName">Paket Adı</label>
+                                <input type="text" class="form-control" id="packageName" asp-for="PackageName" placeholder="Paket adını giriniz" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="packageLimit">Paket Limiti</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="packageLimit" asp-for="PackageLimit" required>
+                                    <div class="input-group-append ml-2">
+                                        <div class="form-check mt-2">
+                                            <input type="checkbox" class="form-check-input" id="unlimitedLimitCheckbox">
+                                            <label class="form-check-label" for="unlimitedLimitCheckbox">Sınırsız olarak ayarla</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount">Fiyat</label>
+                                <input type="number" class="form-control" id="amount" asp-for="Amount" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Açıklama</label>
+                                <textarea class="form-control" id="description" asp-for="Description" placeholder="Açıklama (isteğe bağlı)"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Paketi Kaydet</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const $limitInput = $('#packageLimit');
+        const $checkbox = $('#unlimitedLimitCheckbox');
+
+        if ($limitInput.val() === '2147483647') {
+            $checkbox.prop('checked', true);
+            $limitInput.prop('disabled', true).val('');
+        }
+
+        $checkbox.change(function () {
+            if ($(this).is(':checked')) {
+                $limitInput.prop('disabled', true).val('');
+            } else {
+                $limitInput.prop('disabled', false).val('');
+            }
+        });
+
+        $('form').on('submit', function () {
+            if ($checkbox.is(':checked')) {
+                $limitInput.prop('disabled', false).val('2147483647');
+            }
+        });
+    });
+</script>

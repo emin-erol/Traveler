@@ -25,6 +25,7 @@ namespace Traveler.Persistence.Context
         public DbSet<Feature> Features { get; set; }
         public DbSet<CarClass> CarClasses { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<MileagePackage> MileagePackages { get; set; }
     }
 
 }

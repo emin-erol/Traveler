@@ -1,0 +1,103 @@
+﻿@model UpdateMileagePackageViewModel
+
+@{
+    ViewData["Title"] = "UpdateMileagePackageModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<style>
+    input:disabled {
+        cursor: not-allowed;
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Kilometre Paketini Güncelle</h4>
+                        <p class="card-subtitle mb-4">
+                            Güncellemek istediğiniz kilometre paketi bilgisini lütfen doğru giriniz ve güncelle butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="UpdateMileagePackage" asp-controller="MileagePackage">
+
+                            <input type="hidden" asp-for="MileagePackageId" />
+
+                            <div class="form-group">
+                                <label for="packageName">Paket Adı</label>
+                                <input type="text" class="form-control" id="packageName" asp-for="PackageName" placeholder="Paket adını giriniz" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="packageLimit">Paket Limiti</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="packageLimit" asp-for="PackageLimit" required>
+                                    <div class="input-group-append ml-2">
+                                        <div class="form-check mt-2">
+                                            <input type="checkbox" class="form-check-input" id="unlimitedLimitCheckbox">
+                                            <label class="form-check-label" for="unlimitedLimitCheckbox">Sınırsız olarak ayarla</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="amount">Fiyat</label>
+                                <input type="number" class="form-control" id="amount" asp-for="Amount" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Açıklama</label>
+                                <textarea class="form-control" id="description" asp-for="Description" placeholder="Açıklama (isteğe bağlı)"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Paketi Güncelle</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const maxIntValue = 2147483647;
+        const $limitInput = $("#packageLimit");
+        const $checkbox = $("#unlimitedLimitCheckbox");
+
+        if (parseInt($limitInput.val()) === maxIntValue) {
+            $checkbox.prop("checked", true);
+            $limitInput.prop("disabled", true);
+            $limitInput.data("original", maxIntValue);
+            $limitInput.val("");
+        }
+
+        $checkbox.on("change", function () {
+            if ($(this).is(":checked")) {
+                $limitInput.prop("disabled", true);
+                $limitInput.data("original", $limitInput.val());
+                $limitInput.val("");
+            } else {
+                $limitInput.prop("disabled", false);
+                const original = $limitInput.data("original");
+                if (original == maxIntValue || original == "") {
+                    $limitInput.val("");
+                } else {
+                    $limitInput.val(original);
+                }
+            }
+        });
+
+        $("form").on("submit", function () {
+            if ($checkbox.is(":checked")) {
+                $limitInput.prop("disabled", false);
+                $limitInput.val(maxIntValue);
+            }
+        });
+    });
+</script>

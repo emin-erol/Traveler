@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Traveler.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Traveler.Persistence.Context;
 namespace Traveler.Persistence.Migrations
 {
     [DbContext(typeof(TravelerDbContext))]
-    partial class TravelerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726071122_addMileageTable")]
+    partial class addMileageTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,30 +515,28 @@ namespace Traveler.Persistence.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.MileagePackage", b =>
+            modelBuilder.Entity("Traveler.Domain.Entities.Mileage", b =>
                 {
-                    b.Property<int>("MileagePackageId")
+                    b.Property<int>("MileageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MileagePackageId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MileageId"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PackageLimit")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PackageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("MileagePackageId");
+                    b.Property<string>("MileageType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("MileagePackages");
+                    b.HasKey("MileageId");
+
+                    b.ToTable("Mileages");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Pricing", b =>
