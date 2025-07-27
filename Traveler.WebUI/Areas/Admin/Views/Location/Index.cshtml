@@ -1,0 +1,85 @@
+﻿@model List<GetLocationWithCityAndAvailabilityViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+    int count = 0;
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Lokasyonlar</h4>
+                        <p class="card-subtitle mb-4">
+                            Lokasyonlar ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Lokasyon Adı</th>
+                                        <th>Bulunduğu İl</th>
+                                        <th>Kullanılan Saat Aralıkları</th>
+                                        <th>Kullanılan Gün Aralıkları</th>
+                                        <th>Sil</th>
+                                        <th>Güncelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        count++;
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.LocationName</td>
+                                            <td>@(((CityEnum)item.City.CityName).ToString())</td>
+                                            <td>@item.StartTime - @item.EndTime</td>
+                                            <td>
+                                                <div class="d-flex flex-wrap">
+                                                    @foreach (var day in item.LocationAvailabilities.OrderBy(x => x.DayOfWeek))
+                                                    {
+                                                        var dayName = Enum.GetName(typeof(DayOfWeekEnum), day.DayOfWeek);
+                                                        var isAvailable = day.IsAvailable;
+
+                                                        <div style="width: 50%; font-size: 11px;">
+                                                            @if (isAvailable)
+                                                            {
+                                                                <span style="color: green;">✔️</span> 
+                                                                @dayName
+                                                            }
+                                                            else
+                                                            {
+                                                                <span style="color: red;">❌</span> 
+                                                                @dayName
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/Location/RemoveLocation/@item.LocationId" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/Location/UpdateLocationModal/@item.LocationId" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <a href="/Admin/Location/CreateLocationModal" class="m-3 btn btn-outline-primary">Lokasyon Ekle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

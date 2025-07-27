@@ -32,6 +32,8 @@ builder.Services.AddScoped<ICarClassDal, CarClassRepository>();
 builder.Services.AddScoped<ICarFeatureDal, CarFeatureRepository>();
 builder.Services.AddScoped<IBrandDal, BrandRepository>();
 builder.Services.AddScoped<IMileagePackageDal, MileagePackageRepository>();
+builder.Services.AddScoped<ICityDal, CityRepository>();
+builder.Services.AddScoped<ILocationAvailabilityDal, LocationAvailabilityRepository>();
 
 var app = builder.Build();
 

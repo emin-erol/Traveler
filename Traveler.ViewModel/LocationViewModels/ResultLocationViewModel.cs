@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.Domain.Entities;
 
-namespace Traveler.Application.Dtos.LocationDtos
+namespace Traveler.ViewModel.LocationViewModels
 {
-    public class CreateLocationDto
+    public class ResultLocationViewModel
     {
+        public int LocationId { get; set; }
         public string LocationName { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }

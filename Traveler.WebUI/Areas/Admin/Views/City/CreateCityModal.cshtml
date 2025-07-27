@@ -1,0 +1,41 @@
+﻿@model CreateCityViewModel
+
+@{
+    ViewData["Title"] = "CreateCityModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni İl Oluştur</h4>
+                        <p class="card-subtitle mb-4">
+                            Eklemek istediğiniz yeni il bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="CreateCity" asp-controller="City">
+
+                            <div class="row mb-3">
+                                <label asp-for="CityName" class="col-sm-3 col-form-label text-end">İl</label>
+                                <div class="col-md-12">
+                                    <select asp-for="CityName" class="form-select">
+                                        <option disabled selected value="">Hizmet Verilecek İli Seçin</option>
+                                        @foreach (CityEnum city in Enum.GetValues(typeof(CityEnum)))
+                                        {
+                                            <option value="@( (int)city )">@city</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">İli Kaydet</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

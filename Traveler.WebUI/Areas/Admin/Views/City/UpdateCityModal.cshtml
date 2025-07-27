@@ -1,0 +1,44 @@
+﻿@model UpdateCityViewModel
+
+@{
+    ViewData["Title"] = "UpdateCityModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+
+    var cityList = Enum.GetValues(typeof(CityEnum))
+        .Cast<CityEnum>()
+        .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
+        .ToList();
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">İli Güncelle</h4>
+                        <p class="card-subtitle mb-4">
+                            Güncellemek istediğiniz il bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="UpdateCity" asp-controller="City">
+
+                            <input type="hidden" asp-for="CityId" />
+
+                            <div class="row mb-3">
+                                <label asp-for="CityName" class="col-sm-3 col-form-label text-end">İl</label>
+                                <div class="col-md-12">
+                                    <select asp-for="CityName" asp-items="cityList" class="form-select">
+                                        <option disabled value="">Hizmet Verilecek İli Seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">İli Güncelle</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

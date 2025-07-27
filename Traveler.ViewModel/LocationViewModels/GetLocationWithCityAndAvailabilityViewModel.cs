@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Traveler.ViewModel.CityViewModels;
+using Traveler.ViewModel.LocationAvailabilityViewModels;
 
-namespace Traveler.Domain.Entities
+namespace Traveler.ViewModel.LocationViewModels
 {
-    public class Location
+    public class GetLocationWithCityAndAvailabilityViewModel
     {
         public int LocationId { get; set; }
         public string LocationName { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public string? Description { get; set; }
-        public List<LocationAvailability> LocationAvailabilities { get; set; }
-        public int CityId { get; set; }
-        public City City { get; set; }
+        public ResultCityViewModel City { get; set; }
+        public List<ResultLocationAvailabilityViewModel> LocationAvailabilities { get; set; }
     }
 }

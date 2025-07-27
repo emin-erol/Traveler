@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Traveler.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Traveler.Persistence.Context;
 namespace Traveler.Persistence.Migrations
 {
     [DbContext(typeof(TravelerDbContext))]
-    partial class TravelerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726110652_creatingCityTable")]
+    partial class creatingCityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -457,8 +460,9 @@ namespace Traveler.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CityId"));
 
-                    b.Property<int>("CityName")
-                        .HasColumnType("int");
+                    b.Property<string>("CityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CityId");
 
@@ -519,51 +523,13 @@ namespace Traveler.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationId"));
 
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time");
-
                     b.Property<string>("LocationName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time");
-
                     b.HasKey("LocationId");
 
-                    b.HasIndex("CityId");
-
                     b.ToTable("Locations");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.LocationAvailability", b =>
-                {
-                    b.Property<int>("LocationAvailabilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationAvailabilityId"));
-
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("LocationAvailabilityId");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("LocationAvailabilities");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.MileagePackage", b =>
@@ -744,28 +710,6 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Pricing");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.Location", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.City", "City")
-                        .WithMany("Locations")
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("City");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.LocationAvailability", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.Location", "Location")
-                        .WithMany("LocationAvailabilities")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Cars");
@@ -783,19 +727,9 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Cars");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.City", b =>
-                {
-                    b.Navigation("Locations");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.Feature", b =>
                 {
                     b.Navigation("CarFeatures");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.Location", b =>
-                {
-                    b.Navigation("LocationAvailabilities");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Pricing", b =>
