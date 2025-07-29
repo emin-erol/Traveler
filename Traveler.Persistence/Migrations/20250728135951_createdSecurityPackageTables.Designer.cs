@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Traveler.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Traveler.Persistence.Context;
 namespace Traveler.Persistence.Migrations
 {
     [DbContext(typeof(TravelerDbContext))]
-    partial class TravelerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728135951_createdSecurityPackageTables")]
+    partial class createdSecurityPackageTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -592,23 +595,6 @@ namespace Traveler.Persistence.Migrations
                     b.ToTable("MileagePackages");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.PackageOption", b =>
-                {
-                    b.Property<int>("PackageOptionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PackageOptionId"));
-
-                    b.Property<string>("OptionName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PackageOptionId");
-
-                    b.ToTable("PackageOptions");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.Pricing", b =>
                 {
                     b.Property<int>("PricingId")
@@ -626,124 +612,6 @@ namespace Traveler.Persistence.Migrations
                     b.HasKey("PricingId");
 
                     b.ToTable("Pricings");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.Reservation", b =>
-                {
-                    b.Property<int>("ReservationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReservationId"));
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateOnly>("DropOffDate")
-                        .HasColumnType("date");
-
-                    b.Property<int?>("DropOffLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("DropOffTime")
-                        .HasColumnType("time");
-
-                    b.Property<int?>("MileagePackageId")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("PickUpDate")
-                        .HasColumnType("date");
-
-                    b.Property<int?>("PickUpLocationId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeOnly>("PickUpTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("ReservationCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SecurityPackageId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("UpdatedTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ReservationId");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("DropOffLocationId");
-
-                    b.HasIndex("MileagePackageId");
-
-                    b.HasIndex("PickUpLocationId");
-
-                    b.HasIndex("SecurityPackageId");
-
-                    b.HasIndex("UserId1");
-
-                    b.ToTable("Reservations");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.SecurityPackage", b =>
-                {
-                    b.Property<int>("SecurityPackageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SecurityPackageId"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PackageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("SecurityPackageId");
-
-                    b.ToTable("SecurityPackages");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.SecurityPackageOption", b =>
-                {
-                    b.Property<int>("SecurityPackageOptionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SecurityPackageOptionId"));
-
-                    b.Property<int>("PackageOptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SecurityPackageId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SecurityPackageOptionId");
-
-                    b.HasIndex("PackageOptionId");
-
-                    b.HasIndex("SecurityPackageId");
-
-                    b.ToTable("SecurityPackageOptions");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Service", b =>
@@ -901,73 +769,6 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.Reservation", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.Car", "Car")
-                        .WithMany("Reservations")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Traveler.Domain.Entities.Location", "DropOffLocation")
-                        .WithMany("DropOffReservation")
-                        .HasForeignKey("DropOffLocationId");
-
-                    b.HasOne("Traveler.Domain.Entities.MileagePackage", "MileagePackage")
-                        .WithMany("Reservations")
-                        .HasForeignKey("MileagePackageId");
-
-                    b.HasOne("Traveler.Domain.Entities.Location", "PickUpLocation")
-                        .WithMany("PickUpReservation")
-                        .HasForeignKey("PickUpLocationId");
-
-                    b.HasOne("Traveler.Domain.Entities.SecurityPackage", "SecurityPackage")
-                        .WithMany("Reservations")
-                        .HasForeignKey("SecurityPackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Traveler.Domain.Entities.AppUser", "User")
-                        .WithMany("Reservations")
-                        .HasForeignKey("UserId1");
-
-                    b.Navigation("Car");
-
-                    b.Navigation("DropOffLocation");
-
-                    b.Navigation("MileagePackage");
-
-                    b.Navigation("PickUpLocation");
-
-                    b.Navigation("SecurityPackage");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.SecurityPackageOption", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.PackageOption", "PackageOption")
-                        .WithMany("SecurityPackageOptions")
-                        .HasForeignKey("PackageOptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Traveler.Domain.Entities.SecurityPackage", "SecurityPackage")
-                        .WithMany("SecurityPackageOptions")
-                        .HasForeignKey("SecurityPackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PackageOption");
-
-                    b.Navigation("SecurityPackage");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.AppUser", b =>
-                {
-                    b.Navigation("Reservations");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.Brand", b =>
                 {
                     b.Navigation("Cars");
@@ -978,8 +779,6 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("CarFeatures");
 
                     b.Navigation("CarPricings");
-
-                    b.Navigation("Reservations");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.CarClass", b =>
@@ -999,33 +798,12 @@ namespace Traveler.Persistence.Migrations
 
             modelBuilder.Entity("Traveler.Domain.Entities.Location", b =>
                 {
-                    b.Navigation("DropOffReservation");
-
                     b.Navigation("LocationAvailabilities");
-
-                    b.Navigation("PickUpReservation");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.MileagePackage", b =>
-                {
-                    b.Navigation("Reservations");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.PackageOption", b =>
-                {
-                    b.Navigation("SecurityPackageOptions");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Pricing", b =>
                 {
                     b.Navigation("CarPricings");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.SecurityPackage", b =>
-                {
-                    b.Navigation("Reservations");
-
-                    b.Navigation("SecurityPackageOptions");
                 });
 #pragma warning restore 612, 618
         }

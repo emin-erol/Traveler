@@ -16,5 +16,6 @@ namespace Traveler.Domain.Entities
         public DateOnly BirthDate { get; set; }
         public DateOnly DriverLicenseDate { get; set; }
         public string VerificationCode { get; set; }
+        public List<Reservation> Reservations { get; set; }
     }
 }

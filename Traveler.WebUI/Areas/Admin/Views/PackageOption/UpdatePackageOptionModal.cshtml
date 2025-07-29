@@ -1,0 +1,39 @@
+﻿@model UpdatePackageOptionViewModel
+
+@{
+    ViewData["Title"] = "UpdatePackageOptionModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Seçeneği Güncelle</h4>
+                        <p class="card-subtitle mb-4">
+                            Güncellemek istediğiniz seçenek bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+
+                        <form method="post" asp-action="UpdatePackageOption" asp-controller="PackageOption">
+
+                            <input type="hidden" asp-for="PackageOptionId" />
+
+                            <div class="row mb-3">
+                                <label asp-for="OptionName" class="col-sm-3 col-form-label text-end">Seçenek Adı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="OptionName" class="form-control" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Seçeneği Kaydet</button>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

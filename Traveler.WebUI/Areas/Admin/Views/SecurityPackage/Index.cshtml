@@ -1,0 +1,70 @@
+﻿@model List<GetSecurityPackagesWithPackageOptionsViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+    int count = 0;
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Güvenlik Paketleri</h4>
+                        <p class="card-subtitle mb-4">
+                            Güvenlik paketleri ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                        </p>
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Paket Adı</th>
+                                        <th>Fiyatı</th>
+                                        <th>Paket Seçenekleri</th>
+                                        <th>Sil</th>
+                                        <th>Güncelle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        count++;
+                                        <tr>
+                                            <td>@count</td>
+                                            <td>@item.PackageName</td>
+                                            <td>@item.Amount TL</td>
+                                            <td>
+                                                @foreach(var po in item.SecurityPackageOptions)
+                                                {
+                                                    <div style="width: 50%; font-size: 11px;">
+                                                        <span style="color: green;">✔️</span>
+                                                        @po
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/SecurityPackage/RemoveSecurityPackage/@item.SecurityPackageId" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/SecurityPackage/UpdateSecurityPackageModal/@item.SecurityPackageId" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                            <a href="/Admin/SecurityPackage/CreateSecurityPackageModal" class="m-3 btn btn-outline-primary">Paket Ekle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

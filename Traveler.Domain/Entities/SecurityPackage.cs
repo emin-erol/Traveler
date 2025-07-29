@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace Traveler.Domain.Entities
 {
-    public class MileagePackage
+    public class SecurityPackage
     {
-        public int MileagePackageId { get; set; }
+        public int SecurityPackageId { get; set; }
         public string PackageName { get; set; }
-        public int PackageLimit { get; set; }
         public decimal Amount { get; set; }
-        public string? Description { get; set; }
+        public List<SecurityPackageOption> SecurityPackageOptions { get; set; }
         public List<Reservation> Reservations { get; set; }
     }
 }

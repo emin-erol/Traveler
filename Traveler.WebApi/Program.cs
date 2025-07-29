@@ -34,6 +34,9 @@ builder.Services.AddScoped<IBrandDal, BrandRepository>();
 builder.Services.AddScoped<IMileagePackageDal, MileagePackageRepository>();
 builder.Services.AddScoped<ICityDal, CityRepository>();
 builder.Services.AddScoped<ILocationAvailabilityDal, LocationAvailabilityRepository>();
+builder.Services.AddScoped<IPackageOptionDal, PackageOptionRepository>();
+builder.Services.AddScoped<ISecurityPackageDal, SecurityPackageRepository>();
+builder.Services.AddScoped<ISecurityPackageOptionDal, SecurityPackageOptionRepository>();
 
 var app = builder.Build();
 

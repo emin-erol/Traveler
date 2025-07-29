@@ -30,5 +30,6 @@ namespace Traveler.Domain.Entities
 
         public List<CarFeature> CarFeatures { get; set; }
         public List<CarPricing> CarPricings { get; set; }
+        public List<Reservation> Reservations { get; set; }
     }
 }

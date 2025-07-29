@@ -1,0 +1,79 @@
+﻿@model UpdateSecurityPackageViewModel
+
+@{
+    ViewData["Title"] = "UpdateSecurityPackageModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+
+    var selectedPackageOptionIds = (ViewBag.SecurityPackageOptions as List<ResultSecurityPackageOptionViewModel>)?
+        .Select(cf => cf.PackageOptionId)
+        .ToList() ?? new List<int>();
+
+    var packageOptions = ViewBag.PackageOptions as List<ResultPackageOptionViewModel>;
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h4 class="card-title">Paket Güncelle</h4>
+                        <p class="card-subtitle mb-4">
+                            Bu sayfada paket bilgilerini güncelleyebilirsiniz.
+                        </p>
+
+                        <form asp-action="UpdateSecurityPackage" asp-controller="SecurityPackage" method="post">
+
+                            <input type="hidden" asp-for="SecurityPackageId" />
+
+                            <div class="row mb-3">
+                                <label asp-for="PackageName" class="col-sm-3 col-form-label text-end">Paket Adı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="PackageName" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="Amount" class="col-sm-3 col-form-label text-end">Fiyat</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Amount" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <label class="col-sm-3 col-form-label text-end">Paket Seçenekleri</label>
+                                <div class="col-sm-9">
+                                    <div class="row">
+                                        @foreach (var packageOption in packageOptions!)
+                                        {
+                                            <div class="col-md-3 mb-2">
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           name="SelectedPackageOptionIds"
+                                                           value="@packageOption.PackageOptionId"
+                                                           id="packageOption_@packageOption.PackageOptionId"
+                                                           @(selectedPackageOptionIds.Contains(packageOption.PackageOptionId) ? "checked" : "") />
+                                                    <label class="form-check-label" for="packageOption_@packageOption.PackageOptionId">
+                                                        @packageOption.OptionName
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="offset-sm-3 col-sm-9 text-end">
+                                    <button type="submit" class="btn btn-success">Güncelle</button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

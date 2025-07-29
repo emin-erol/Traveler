@@ -28,6 +28,27 @@ namespace Traveler.Persistence.Context
         public DbSet<MileagePackage> MileagePackages { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<LocationAvailability> LocationAvailabilities { get; set; }
+        public DbSet<SecurityPackage> SecurityPackages { get; set; }
+        public DbSet<PackageOption> PackageOptions { get; set; }
+        public DbSet<SecurityPackageOption> SecurityPackageOptions { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(x => x.PickUpLocation)
+                .WithMany(y => y.PickUpReservation)
+                .HasForeignKey(z => z.PickUpLocationId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<Reservation>()
+                .HasOne(x => x.DropOffLocation)
+                .WithMany(y => y.DropOffReservation)
+                .HasForeignKey(z => z.DropOffLocationId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        }
     }
 
 }
