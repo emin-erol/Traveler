@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Traveler.Domain.Entities
+namespace Traveler.ViewModel.ReservationViewModels
 {
-    public class Reservation
+    public class CreateReservationViewModel
     {
-        public int ReservationId { get; set; }
         public string ReservationCode { get; set; }
         public int? PickUpLocationId { get; set; }
         public int? DropOffLocationId { get; set; }
@@ -24,12 +23,5 @@ namespace Traveler.Domain.Entities
         public decimal TotalAmount { get; set; }
         public string Description { get; set; }
         public string UserId { get; set; }
-
-        public Location PickUpLocation { get; set; }
-        public Location DropOffLocation { get; set; }
-        public Car Car { get; set; }
-        public MileagePackage MileagePackage { get; set; }
-        public SecurityPackage SecurityPackage { get; set; }
-        public AppUser User { get; set; }
     }
 }

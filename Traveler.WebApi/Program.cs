@@ -37,6 +37,7 @@ builder.Services.AddScoped<ILocationAvailabilityDal, LocationAvailabilityReposit
 builder.Services.AddScoped<IPackageOptionDal, PackageOptionRepository>();
 builder.Services.AddScoped<ISecurityPackageDal, SecurityPackageRepository>();
 builder.Services.AddScoped<ISecurityPackageOptionDal, SecurityPackageOptionRepository>();
+builder.Services.AddScoped<IReservationDal, ReservationRepository>();
 
 var app = builder.Build();
 
