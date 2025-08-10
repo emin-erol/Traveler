@@ -15,6 +15,10 @@
         ?.Select(x => new SelectListItem { Text = x.ClassName, Value = x.CarClassId.ToString() })
         .ToList();
 
+    var locationsList = (ViewBag.Locations as List<ResultLocationViewModel>)
+        ?.Select(x => new SelectListItem { Text = x.LocationName, Value = x.LocationId.ToString() })
+        .ToList();
+
     var fuelList = Enum.GetValues(typeof(FuelEnum))
         .Cast<FuelEnum>()
         .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
@@ -130,6 +134,15 @@
                                 <div class="col-sm-9">
                                     <select asp-for="CarClassId" asp-items="carClassList" class="form-select">
                                         <option disabled value="">Sınıf Seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="LocationId" class="col-sm-3 col-form-label text-end">Lokasyon</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="LocationId" asp-items="locationsList" class="form-select">
+                                        <option disabled value="">Lokasyon Seçin</option>
                                     </select>
                                 </div>
                             </div>

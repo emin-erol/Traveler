@@ -24,5 +24,9 @@ namespace Traveler.ViewModel.CarViewModels
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
         public List<int> SelectedFeatureIds { get; set; }
+        public int LocationId { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
+        public DateTime LastUsedTime { get; set; }
     }
 }

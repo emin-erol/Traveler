@@ -12,5 +12,6 @@ namespace Traveler.Application.Interfaces
     {
         Task<List<GetCarWithBrandAndClassDto>> GetCarsWithBrandAndClass();
         Task<GetCarWithAllDetailsDto> GetCarWithAllDetails(int carId);
+        Task<List<GetCarWithAllDetailsDto>> GetCarsWithAllDetailsByLocation(int locationId);
     }
 }

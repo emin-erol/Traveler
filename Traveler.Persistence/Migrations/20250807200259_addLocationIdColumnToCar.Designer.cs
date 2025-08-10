@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Traveler.Persistence.Context;
 
@@ -11,9 +12,11 @@ using Traveler.Persistence.Context;
 namespace Traveler.Persistence.Migrations
 {
     [DbContext(typeof(TravelerDbContext))]
-    partial class TravelerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250807200259_addLocationIdColumnToCar")]
+    partial class addLocationIdColumnToCar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,18 +341,12 @@ namespace Traveler.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Fuel")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("LastUsedTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
@@ -376,9 +373,6 @@ namespace Traveler.Persistence.Migrations
 
                     b.Property<int>("Transmission")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");

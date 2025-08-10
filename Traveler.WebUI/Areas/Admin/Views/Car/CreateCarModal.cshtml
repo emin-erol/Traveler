@@ -110,6 +110,19 @@
                             </div>
 
                             <div class="row mb-3">
+                                <label asp-for="LocationId" class="col-sm-3 col-form-label text-end">Lokasyon</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="LocationId" class="form-select">
+                                        <option disabled selected value="">Lokasyon Seçin</option>
+                                        @foreach (var location in ViewBag.Locations as List<ResultLocationViewModel>)
+                                        {
+                                            <option value="@location.LocationId">@location.LocationName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
                                 <label asp-for="Fuel" class="col-sm-3 col-form-label text-end">Yakıt Türü</label>
                                 <div class="col-sm-9">
                                     <select asp-for="Fuel" class="form-select">

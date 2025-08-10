@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Traveler.ViewModel.BrandViewModels;
 using Traveler.ViewModel.CarClassViewModels;
+using Traveler.ViewModel.CarPricingViewModels;
+using Traveler.ViewModel.PricingViewModels;
 
 namespace Traveler.ViewModel.CarViewModels
 {
@@ -26,5 +28,11 @@ namespace Traveler.ViewModel.CarViewModels
         public ResultBrandViewModel Brand { get; set; }
         public ResultCarClassViewModel CarClass { get; set; }
         public List<string> FeatureNames { get; set; }
+        public string LocationName { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
+        public DateTime LastUsedTime { get; set; }
+        public List<ResultPricingViewModel> Pricings { get; set; }
+        public List<ResultCarPricingViewModel> CarPricings { get; set; }
     }
 }

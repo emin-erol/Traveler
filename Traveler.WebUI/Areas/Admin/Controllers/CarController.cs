@@ -9,6 +9,7 @@ using Traveler.ViewModel.CarFeatureViewModels;
 using Traveler.ViewModel.CarPricingViewModels;
 using Traveler.ViewModel.CarViewModels;
 using Traveler.ViewModel.FeatureViewModels;
+using Traveler.ViewModel.LocationViewModels;
 using Traveler.ViewModel.PricingViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
@@ -70,26 +71,31 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
             var carClassResponse = await client.GetAsync("https://localhost:7252/api/CarClasses");
             var featuresResponse = await client.GetAsync("https://localhost:7252/api/Features");
             var pricingsResponse = await client.GetAsync("https://localhost:7252/api/Pricings");
+            var locationsResponse = await client.GetAsync("https://localhost:7252/api/Locations");
 
             if (brandResponse.IsSuccessStatusCode &&
                 carClassResponse.IsSuccessStatusCode &&
                 featuresResponse.IsSuccessStatusCode &&
-                pricingsResponse.IsSuccessStatusCode)
+                pricingsResponse.IsSuccessStatusCode &&
+                locationsResponse.IsSuccessStatusCode)
             {
                 var brandJson = await brandResponse.Content.ReadAsStringAsync();
                 var carClassJson = await carClassResponse.Content.ReadAsStringAsync();
                 var featuresJson = await featuresResponse.Content.ReadAsStringAsync();
                 var pricingsJson = await pricingsResponse.Content.ReadAsStringAsync();
+                var locationsJson = await locationsResponse.Content.ReadAsStringAsync();
 
                 var brandValues = JsonConvert.DeserializeObject<List<ResultBrandViewModel>>(brandJson);
                 var carClassValues = JsonConvert.DeserializeObject<List<ResultCarClassViewModel>>(carClassJson);
                 var featuresValues = JsonConvert.DeserializeObject<List<ResultFeatureViewModel>>(featuresJson);
                 var pricingsValues = JsonConvert.DeserializeObject<List<ResultPricingViewModel>>(pricingsJson);
+                var locationsValues = JsonConvert.DeserializeObject<List<ResultLocationViewModel>>(locationsJson);
 
                 ViewBag.Brands = brandValues;
                 ViewBag.CarClasses = carClassValues;
                 ViewBag.Features = featuresValues;
                 ViewBag.Pricings = pricingsValues;
+                ViewBag.Locations = locationsValues;
 
                 return View();
             }
@@ -103,6 +109,10 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         {
             var dto = request.Dto;
             var cpDtos = request.CpDtos;
+
+            dto.CreatedTime = DateTime.Now;
+            dto.UpdatedTime = DateTime.Now;
+            dto.LastUsedTime = DateTime.Now;
 
             var client = _httpClientFactory.CreateClient();
 
@@ -174,6 +184,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
             var pricingsResponse = await client.GetAsync("https://localhost:7252/api/Pricings");
             var carFeaturesResponse = await client.GetAsync("https://localhost:7252/api/CarFeatures/GetCarFeaturesByCarId/" + carId);
             var carPricingsResponse = await client.GetAsync("https://localhost:7252/api/CarPricings/GetCarPricingsByCarId/" + carId);
+            var locationsResponse = await client.GetAsync("https://localhost:7252/api/Locations");
 
             if (carResponse.IsSuccessStatusCode &&
                 brandResponse.IsSuccessStatusCode &&
@@ -181,7 +192,8 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 featuresResponse.IsSuccessStatusCode &&
                 carFeaturesResponse.IsSuccessStatusCode &&
                 carPricingsResponse.IsSuccessStatusCode &&
-                pricingsResponse.IsSuccessStatusCode)
+                pricingsResponse.IsSuccessStatusCode &&
+                locationsResponse.IsSuccessStatusCode)
             {
                 var carJson = await carResponse.Content.ReadAsStringAsync();
                 var brandJson = await brandResponse.Content.ReadAsStringAsync();
@@ -190,6 +202,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 var pricingsJson = await pricingsResponse.Content.ReadAsStringAsync();
                 var carFeaturesJson = await carFeaturesResponse.Content.ReadAsStringAsync();
                 var carPricingsJson = await carPricingsResponse.Content.ReadAsStringAsync();
+                var locationsJson = await locationsResponse.Content.ReadAsStringAsync();
 
                 var carValue = JsonConvert.DeserializeObject<UpdateCarViewModel>(carJson);
                 var brandValues = JsonConvert.DeserializeObject<List<ResultBrandViewModel>>(brandJson);
@@ -198,6 +211,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 var pricingsValues = JsonConvert.DeserializeObject<List<ResultPricingViewModel>>(pricingsJson);
                 var carFeaturesValues = JsonConvert.DeserializeObject<List<ResultCarFeatureViewModel>>(carFeaturesJson);
                 var carPricingsValues = JsonConvert.DeserializeObject<List<ResultCarPricingViewModel>>(carPricingsJson);
+                var locationsValues = JsonConvert.DeserializeObject<List<ResultLocationViewModel>>(locationsJson);
 
                 ViewBag.Brands = brandValues;
                 ViewBag.CarClasses = carClassValues;
@@ -205,6 +219,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 ViewBag.Pricings = pricingsValues;
                 ViewBag.CarFeatures = carFeaturesValues;
                 ViewBag.CarPricings = carPricingsValues;
+                ViewBag.Locations = locationsValues;
 
                 return View(carValue);
             }
@@ -217,6 +232,9 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         public async Task<IActionResult> UpdateCar([FromBody] UpdateCarRequestViewModel request)
         {
             var dto = request.Dto;
+
+            dto.UpdatedTime = DateTime.Now;
+
             var cpDtos = request.CpDtos;
 
             var client = _httpClientFactory.CreateClient();

@@ -49,6 +49,14 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
+        [HttpGet("GetCarsWithAllDetailsByLocation/{locationId}")]
+        public async Task<IActionResult> GetCarsWithAllDetailsByLocation(int locationId)
+        {
+            var values = await _carDal.GetCarsWithAllDetailsByLocation(locationId);
+
+            return Ok(values);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCar(CreateCarDto model)
         {
@@ -67,7 +75,11 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
-                Status = model.Status
+                Status = model.Status,
+                LocationId = model.LocationId,
+                CreatedTime = model.CreatedTime,
+                UpdatedTime = model.UpdatedTime,
+                LastUsedTime = model.LastUsedTime,
             };
 
             await _carDal.CreateAsync(car);
@@ -94,7 +106,11 @@ namespace Traveler.WebApi.Controllers
                 Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
-                Status = model.Status
+                Status = model.Status,
+                LocationId = model.LocationId,
+                CreatedTime = model.CreatedTime,
+                UpdatedTime = model.UpdatedTime,
+                LastUsedTime = model.LastUsedTime,
             };
 
             await _carDal.UpdateAsync(car);

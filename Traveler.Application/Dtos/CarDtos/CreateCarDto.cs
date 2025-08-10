@@ -22,5 +22,9 @@ namespace Traveler.Application.Dtos.CarDtos
         public int Status { get; set; }
         public int BrandId { get; set; }
         public int CarClassId { get; set; }
+        public int LocationId { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
+        public DateTime LastUsedTime { get; set; }
     }
 }

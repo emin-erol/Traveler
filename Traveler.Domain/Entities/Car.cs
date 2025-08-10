@@ -21,12 +21,18 @@ namespace Traveler.Domain.Entities
         public string BigImageUrl { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
+        public DateTime CreatedTime { get; set; }
+        public DateTime UpdatedTime { get; set; }
+        public DateTime LastUsedTime { get; set; }
 
         public int BrandId { get; set; }
         public Brand Brand { get; set; }
 
         public int CarClassId { get; set; }
         public CarClass CarClass { get; set; }
+
+        public int LocationId { get; set; }
+        public Location Location { get; set; }
 
         public List<CarFeature> CarFeatures { get; set; }
         public List<CarPricing> CarPricings { get; set; }

@@ -17,6 +17,7 @@
                     <h3 class="card-title text-primary">@Model.Brand.Name @Model.Model</h3>
                     <p class="card-text"><strong>Stok No:</strong> @Model.StockNumber</p>
                     <p class="card-text"><strong>Sınıf:</strong> @Model.CarClass.ClassName</p>
+                    <p class="card-text"><strong>Lokasyon:</strong> @Model.LocationName</p>
                     <p class="card-text"><strong>Model Yılı:</strong> @Model.Year</p>
                     
                     <p class="card-text"><strong>KM:</strong> @Model.Mileage.ToString("N0") km</p>
@@ -46,6 +47,9 @@
                         }
                         <span class="badge @badgeClass">@status.ToString()</span>
                     </p>
+                    <p class="card-text"><strong>Oluşturulma Tarihi:</strong> @Model.CreatedTime</p>
+                    <p class="card-text"><strong>Son Güncelleme Tarihi:</strong> @Model.UpdatedTime</p>
+                    <p class="card-text"><strong>Son Kullanılan Tarih:</strong> @Model.LastUsedTime</p>
                 </div>
             </div>
         </div>

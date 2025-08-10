@@ -1,90 +1,20 @@
-﻿@using Traveler.ViewModel.Enums
-@model List<GetLocationWithCityAndAvailabilityViewModel>
+﻿<div class="col-md-4 request-form ftco-animate bg-primary text-white p-4 rounded d-flex flex-column justify-content-between">
+    <div>
+        <h2 class="mb-4 text-center">Yolculuğunuzu Belirleyin</h2>
 
-<style>
-    select.form-control {
-        background-color: white;
-        color: black;
-        cursor: pointer;
-    }
+        <ol class="mb-4">
+            <li>Alış ve teslim lokasyonlarınızı seçin.</li>
+            <li>Alış ve teslim tarih-saat bilgilerinizi girin.</li>
+            <li>Lokasyonda mevcut araçlardan size uygun olanı seçin.</li>
+            <li>Kişisel bilgilerinizi doldurun ve rezervasyonunuzu onaylayın.</li>
+        </ol>
+    </div>
 
-        select.form-control option {
-            background-color: white;
-            color: black;
-            cursor: pointer;
-        }
-</style>
-
-
-<div class="col-md-4 d-flex align-items-center">
-    <form id="createPreReservationForm" class="request-form ftco-animate bg-primary">
-        <h2>Yolculuğunuzu Belirleyin</h2>
-
-        <div class="form-group">
-            <label for="pickup-location" class="label">Alış Lokasyonu</label>
-            <select id="pickup-location" class="form-control">
-                <option disabled selected>Bir lokasyon seçin</option>
-                @foreach (var location in Model)
-                {
-                    var unusableDays = location.LocationAvailabilities
-                    .Where(x => !x.IsAvailable)
-                    .Select(x => ((DayOfWeekEnum)x.DayOfWeek).ToString())
-                    .ToList();
-
-                    <option value="@location.LocationId">
-                        @location.LocationName, @(((CityEnum)location.City.CityName).ToString())
-                        <span class="d-block text-light" style="font-size: 0.85rem;">
-                            @(unusableDays.Any() ? $"Kullanılamaz günler: {string.Join(", ", unusableDays)}" : "Her gün uygun")
-                        </span>
-                    </option>
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="dropoff-location" class="label">Teslim Lokasyonu</label>
-            <select id="dropoff-location" class="form-control">
-                <option disabled selected>Bir lokasyon seçin</option>
-                @foreach (var location in Model)
-                {
-                    var unusableDays = location.LocationAvailabilities
-                    .Where(x => !x.IsAvailable)
-                    .Select(x => ((DayOfWeekEnum)x.DayOfWeek).ToString())
-                    .ToList();
-
-                    <option value="@location.LocationId">
-                        @location.LocationName, @(((CityEnum)location.City.CityName).ToString())
-                        <span class="d-block text-light" style="font-size: 0.85rem;">
-                            @(unusableDays.Any() ? $"Kullanılamaz günler: {string.Join(", ", unusableDays)}" : "Her gün uygun")
-                        </span>
-                    </option>
-                }
-            </select>
-        </div>
-
-        <div class="d-flex">
-            <div class="form-group mr-2">
-                <label class="label">Alış Tarihi</label>
-                <input type="date" class="form-control" id="book_pick_date" placeholder="Tarih">
-            </div>
-            <div class="form-group ml-2">
-                <label class="label">Teslim Tarihi</label>
-                <input type="date" class="form-control" id="book_off_date" placeholder="Tarih">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="label">Alış Saati</label>
-            <input type="time" class="form-control" id="time_pick" placeholder="Saat">
-        </div>
-
-        <div class="form-group">
-            <label class="label">Teslim Saati</label>
-            <input type="time" class="form-control" id="time_drop" placeholder="Saat">
-        </div>
-
-        <div class="form-group">
-            <input type="submit" value="Rezervasyon Oluştur" class="btn btn-secondary py-3 px-4">
-        </div>
-    </form>
+    <div class="text-center mt-auto">
+        <a asp-controller="Reservation"
+           asp-action="CreateReservationModal"
+           class="btn btn-light text-primary py-3 px-5 fw-bold">
+            Rezervasyon Oluştur
+        </a>
+    </div>
 </div>
