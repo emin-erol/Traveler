@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using Traveler.ViewModel.CarViewModels;
 using Traveler.ViewModel.LocationViewModels;
+using Traveler.ViewModel.MileagePackageViewModels;
 using Traveler.ViewModel.ReservationViewModels;
+using Traveler.ViewModel.SecurityPackageViewModels;
 
 namespace Traveler.WebUI.Controllers
 {
@@ -38,18 +40,35 @@ namespace Traveler.WebUI.Controllers
             var client = _httpClientFactory.CreateClient();
 
             var locationResponse = await client.GetAsync("https://localhost:7252/api/Locations/GetLocationWithCityAndAvailability");
-            
-            if (locationResponse.IsSuccessStatusCode)
+            var mileagePackageResponse = await client.GetAsync("https://localhost:7252/api/MileagePackages");
+            var securityPackageResponse = await client.GetAsync("https://localhost:7252/api/SecurityPackages/GetAllSecurityPackagesWithPackageOptions");
+
+            if (locationResponse.IsSuccessStatusCode &&
+                mileagePackageResponse.IsSuccessStatusCode &&
+                securityPackageResponse.IsSuccessStatusCode)
             {
                 var locationJson = await locationResponse.Content.ReadAsStringAsync();
+                var mileagePackageJson = await mileagePackageResponse.Content.ReadAsStringAsync();
+                var securityPackageJson = await securityPackageResponse.Content.ReadAsStringAsync();
+
                 var locationValues = JsonConvert.DeserializeObject<List<GetLocationWithCityAndAvailabilityViewModel>>(locationJson);
+                var mileagePackageValues = JsonConvert.DeserializeObject<List<ResultMileagePackageViewModel>>(mileagePackageJson);
+                var securityPackageValues = JsonConvert.DeserializeObject<List<GetSecurityPackagesWithPackageOptionsViewModel>>(securityPackageJson);
 
                 ViewBag.Locations = locationValues;
+                ViewBag.MileagePackages = mileagePackageValues;
+                ViewBag.SecurityPackages = securityPackageValues;
                 ViewBag.v1 = "Rezervasyon";
                 ViewBag.v2 = "Rezervasyon İşlemi";
             }
 
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateReservation([FromBody]CreateReservationViewModel viewModel)
+        {
+            return View(viewModel);
         }
     }
 }

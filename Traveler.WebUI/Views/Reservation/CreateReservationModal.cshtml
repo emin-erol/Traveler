@@ -9,15 +9,91 @@
     var locations = ViewBag.Locations as List<GetLocationWithCityAndAvailabilityViewModel>
                     ?? new List<GetLocationWithCityAndAvailabilityViewModel>();
 
+    var mileagePackages = ViewBag.MileagePackages as List<ResultMileagePackageViewModel>;
+
+    var securityPackages = ViewBag.SecurityPackages as List<GetSecurityPackagesWithPackageOptionsViewModel>;
+
     var cityEnumList = Enum.GetValues(typeof(CityEnum))
         .Cast<CityEnum>()
         .Select(e => new { Id = (int)e, Name = e.ToString() })
         .ToList();
 }
 
+<style>
+    .car-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .car-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 5;
+        }
+
+        .car-card img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .car-card.border-primary {
+            border: 3px solid #007bff;
+        }
+
+    .mileage-card {
+        transition: all 0.2s ease-in-out;
+    }
+
+        .mileage-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .mileage-card.border-primary {
+            border-width: 2px !important;
+        }
+
+    .package-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 2px solid transparent;
+    }
+
+        .package-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .package-card.selected {
+            border-color: #0d6efd;
+            box-shadow: 0 0 10px rgba(13,110,253,0.5);
+        }
+
+    .package-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .package-limit {
+        font-weight: 600;
+    }
+
+    .option-list li {
+        position: relative;
+        padding-left: 25px;
+        margin-bottom: 5px;
+    }
+
+        .option-list li::before {
+            content: "✔";
+            color: #28a745;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+</style>
+
 <section class="ftco-section contact-section">
 
-    <!-- 1. Adım: Lokasyon ve Tarih/Saat Seçimi -->
     <div id="step1" class="container">
         <div class="row d-flex mb-5 contact-info">
             <div class="col-md-12 block-9 mb-md-5">
@@ -104,436 +180,772 @@
         </div>
     </div>
 
-    <!-- 2. Adım: Araç Seçimi -->
     <div id="step2" class="container" style="display:none;">
-        <h3 class="alert alert-info">Araç Seçimi - 2. Adım</h3>
+        <div class="row d-flex mb-5 contact-info">
+            <div class="col-md-12 block-9 mb-md-5">
+                <h3 class="alert alert-info">Araç Seçimi - 2. Adım</h3>
 
-        <div id="carsList" class="row">
-            <!-- Araç kartları buraya gelecek -->
+                <div id="carsList" class="row"></div>
+
+                <div class="mt-3">
+                    <button type="button" id="backToStep1" class="btn btn-secondary">Geri</button>
+                    <button type="button" id="nextStep2" class="btn btn-primary" disabled>İleri</button>
+                </div>
+                <input type="hidden" id="selectedCarId" name="SelectedCarId" />
+                <input type="hidden" id="selectedCarPrice" />
+            </div>
         </div>
+    </div>
+
+    <div id="step3" class="container mt-4" style="display:none;">
+        <h3 class="alert alert-info">Kilometre Seçimi - 3. Adım</h3>
+        <div class="row" id="mileagePackageContainer">
+            <div class="col-md-4 mb-3">
+                <div class="card mileage-card h-100"
+                     data-id="0"
+                     data-limit="0"
+                     data-amount="0"
+                     style="cursor:pointer;">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Paket Seçmek İstemiyorum</h5>
+                        <div class="d-flex justify-content-between">
+                            <span><strong>Limit:</strong> 0 km</span>
+                            <span><strong>Fiyat:</strong> 20 TL/Km</span>
+                        </div>
+                        <p class="mt-2">
+                            Kilometre paketi seçmek istemiyorsanız bu kutucuğu seçerek kilometre başına ücretlendirilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            @if (ViewBag.MileagePackages != null)
+            {
+                foreach (var pkg in ViewBag.MileagePackages)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card mileage-card h-100"
+                             data-id="@pkg.MileagePackageId"
+                             data-limit="@pkg.PackageLimit"
+                             data-amount="@pkg.Amount"
+                             style="cursor:pointer;">
+                            <div class="card-body">
+                                <h5 class="card-title text-center">@pkg.PackageName</h5>
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Limit:</strong> @(pkg.PackageLimit == int.MaxValue ? "Sınırsız" : pkg.PackageLimit + " km")</span>
+                                    <span><strong>Fiyat:</strong> @pkg.Amount.ToString("N2") TL</span>
+                                </div>
+                                <p class="mt-2">@pkg.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <input type="hidden" id="selectedMileagePackageId" name="SelectedMileagePackageId" />
+        <div class="mt-3">
+            <button type="button" id="backToStep2" class="btn btn-secondary">Geri</button>
+            <button type="button" id="nextStep3" class="btn btn-primary" disabled>İleri</button>
+        </div>
+        <input type="hidden" id="selectedMileagePackageId" name="SelectedMileagePackageId" />
+    </div>
+
+    <div id="step4" class="container mt-4" style="display:none;">
+        <h3 class="alert alert-info">Güvenlik Paketi Seçimi - 4. Adım</h3>
+        <div class="row" id="securityPackageContainer">
+
+            @if (securityPackages != null)
+            {
+                foreach (var pkg in securityPackages)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card security-card h-100"
+                             data-id="@pkg.SecurityPackageId"
+                             data-amount="@pkg.Amount"
+                             style="cursor:pointer;">
+                            <div class="card-body">
+                                <h5 class="card-title text-center">@pkg.PackageName</h5>
+                                @if (pkg.SecurityPackageOptions != null && pkg.SecurityPackageOptions.Any())
+                                {
+                                    <ul class="list-unstyled">
+                                        @foreach (var option in pkg.SecurityPackageOptions)
+                                        {
+                                            <li>✔ @option</li>
+                                        }
+                                    </ul>
+                                }
+                                <div class="text-center mb-3">
+                                    <strong>Fiyat:</strong> @pkg.Amount.ToString("N2") TL
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <input type="hidden" id="selectedSecurityPackageId" name="SelectedSecurityPackageId" />
 
         <div class="mt-3">
-            <button type="button" id="backToStep1" class="btn btn-secondary">Geri</button>
-            <button type="button" id="nextStep2" class="btn btn-primary" disabled>İleri</button>
+            <button type="button" id="backToStep3" class="btn btn-secondary">Geri</button>
+            <button type="submit" id="finishReservation" class="btn btn-success" disabled>Rezervasyonu Tamamla</button>
         </div>
     </div>
 
 </section>
 
+<div class="modal fade" id="carDetailModal" tabindex="-1" aria-labelledby="carDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="carDetailModalLabel">Araç Detayı</h5>
+                <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="card shadow-lg border-0">
+                        <div class="row g-0">
+                            <div class="col-md-6">
+                                <img id="detailImage" src="" alt="Araç Resmi" class="img-fluid rounded-start w-100 h-100 object-fit-cover" style="max-height: 500px;">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card-body">
+                                    <h3 class="card-title text-primary" id="detailTitle"></h3>
+                                    <p><strong>Sınıf:</strong> <span id="detailClass"></span></p>
+                                    <p><strong>Lokasyon:</strong> <span id="detailLocation"></span></p>
+                                    <p><strong>Model Yılı:</strong> <span id="detailYear"></span></p>
+                                    <p><strong>Vites:</strong> <span id="detailTransmission"></span></p>
+                                    <p><strong>Yakıt Türü:</strong> <span id="detailFuel"></span></p>
+                                    <p><strong>Koltuk Sayısı:</strong> <span id="detailSeat"></span></p>
+                                    <p><strong>Bagaj:</strong> <span id="detailLuggage"></span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer" id="detailFeaturesWrapper" style="display:none;">
+                            <h5>Araç Özellikleri</h5>
+                            <div class="row" id="detailFeatures"></div>
+                        </div>
+
+                        <div class="card-footer mt-4">
+                            <h5>Araç Açıklaması</h5>
+                            <p id="detailDescription"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    var locations = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(locations));
-    var cityEnum = @Html.Raw(JsonConvert.SerializeObject(cityEnumList));
+    $(function () {
+        var locations = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(locations));
+        var cityEnum = @Html.Raw(JsonConvert.SerializeObject(cityEnumList));
 
-    const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma", 6: "Cumartesi", 7: "Pazar" };
+        const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma", 6: "Cumartesi", 7: "Pazar" };
 
-    function formatTimeRange(start, end) {
-        if (!start || !end) return "Belirtilmemiş";
-        return (start.length >= 5 ? start.substring(0,5) : start) + " - " + (end.length >= 5 ? end.substring(0,5) : end);
-    }
+        function dayOrCityName(cityId) {
+            var city = cityEnum.find(c => c.Id === cityId);
+            return city ? city.Name : "-";
+        }
 
-    function availableDaysText(loc) {
-        if (!loc || !loc.LocationAvailabilities) return "Bilgi yok";
-        var days = loc.LocationAvailabilities
-            .filter(x => x.IsAvailable)
-            .map(x => dayNames[x.DayOfWeek])
-            .filter(Boolean);
-        return days.length ? days.join(", ") : "Herhangi bir gün açık değil";
-    }
+        function formatTimeRange(start, end) {
+            if (!start || !end) return "Belirtilmemiş";
+            return (start.length >= 5 ? start.substring(0,5) : start) + " - " + (end.length >= 5 ? end.substring(0,5) : end);
+        }
 
-    function isLocationAvailableOnDate(loc, dateObj) {
-        if (!loc) return false;
-        var jsDay = dateObj.getDay();
-        var modelDay = (jsDay === 0) ? 7 : jsDay;
-        var entry = loc.LocationAvailabilities && loc.LocationAvailabilities.find(x => x.DayOfWeek === modelDay);
-        return entry ? !!entry.IsAvailable : false;
-    }
+        function availableDaysText(loc) {
+            if (!loc || !loc.LocationAvailabilities) return "Bilgi yok";
+            var days = loc.LocationAvailabilities
+                .filter(x => x.IsAvailable)
+                .map(x => dayNames[x.DayOfWeek])
+                .filter(Boolean);
+            return days.length ? days.join(", ") : "Herhangi bir gün açık değil";
+        }
 
-    function parseTimeToMinutes(hhmm) {
-        if (!hhmm) return null;
-        var parts = hhmm.split(":");
-        if (parts.length < 2) return null;
-        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-    }
+        function isLocationAvailableOnDate(loc, dateObj) {
+            if (!loc) return false;
+            var jsDay = dateObj.getDay();
+            var modelDay = (jsDay === 0) ? 7 : jsDay;
+            var entry = loc.LocationAvailabilities && loc.LocationAvailabilities.find(x => x.DayOfWeek === modelDay);
+            return entry ? !!entry.IsAvailable : false;
+        }
 
-    function timeWithinRange(timeStr, startStr, endStr) {
-        var t = parseTimeToMinutes(timeStr);
-        var s = parseTimeToMinutes((startStr || "").substring(0,5));
-        var e = parseTimeToMinutes((endStr || "").substring(0,5));
-        if (t === null || s === null || e === null) return false;
-        return t >= s && t <= e;
-    }
+        function parseTimeToMinutes(hhmm) {
+            if (!hhmm) return null;
+            var parts = hhmm.split(":");
+            if (parts.length < 2) return null;
+            return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+        }
 
-    function formatLocationDetailsHtml(loc) {
-        if (!loc) return "";
-        var start = loc.StartTime ? loc.StartTime.substring(0,5) : "";
-        var end = loc.EndTime ? loc.EndTime.substring(0,5) : "";
-        var days = availableDaysText(loc);
-        var desc = loc.Description ? `<div class="small text-muted mb-1">${loc.Description}</div>` : "";
-        return `
-            ${desc}
-            <div class="p-2 border rounded bg-light">
-                <div><strong>Çalışma Saatleri:</strong> ${start ? start : "-"} - ${end ? end : "-"}</div>
-                <div><strong>Aktif Günler:</strong> ${days}</div>
-                <div><strong>Şehir:</strong> ${loc.City ? ( (typeof loc.City.CityName === "number") ? dayOrCityName(loc.City.CityName) : loc.City.CityName) : "-"}</div>
-            </div>
-        `;
-    }
+        function timeWithinRange(timeStr, startStr, endStr) {
+            var t = parseTimeToMinutes(timeStr);
+            var s = parseTimeToMinutes((startStr || "").substring(0,5));
+            var e = parseTimeToMinutes((endStr || "").substring(0,5));
+            if (t === null || s === null || e === null) return false;
+            return t >= s && t <= e;
+        }
 
-    function dayOrCityName(cityId) {
-        var city = cityEnum.find(c => c.Id === cityId);
-        return city ? city.Name : "-";
-    }
+        function formatLocationDetailsHtml(loc) {
+            if (!loc) return "";
+            var start = loc.StartTime ? loc.StartTime.substring(0,5) : "";
+            var end = loc.EndTime ? loc.EndTime.substring(0,5) : "";
+            var days = availableDaysText(loc);
+            var desc = loc.Description ? `<div class="small text-muted mb-1">${loc.Description}</div>` : "";
+            return `
+                ${desc}
+                <div class="p-2 border rounded bg-light">
+                    <div><strong>Çalışma Saatleri:</strong> ${start ? start : "-"} - ${end ? end : "-"}</div>
+                    <div><strong>Aktif Günler:</strong> ${days}</div>
+                    <div><strong>Şehir:</strong> ${loc.City ? ( (typeof loc.City.CityName === "number") ? dayOrCityName(loc.City.CityName) : loc.City.CityName) : "-"}</div>
+                </div>
+            `;
+        }
 
-    function getNextAvailableDate(loc, fromDate) {
-        if (!loc) return null;
-        var start = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
-        for (var i = 0; i < 365; i++) {
-            var d = new Date(start);
-            d.setDate(start.getDate() + i);
-            if (isLocationAvailableOnDate(loc, d)) {
-                return d;
+        function getNextAvailableDate(loc, fromDate) {
+            if (!loc) return null;
+            var start = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+            for (var i = 0; i < 365; i++) {
+                var d = new Date(start);
+                d.setDate(start.getDate() + i);
+                if (isLocationAvailableOnDate(loc, d)) {
+                    return d;
+                }
             }
+            return null;
         }
-        return null;
-    }
 
-    var $pickupSelect = $('#pickupLocation');
-    var $dropoffSelect = $('#dropoffLocation');
-    var $pickupDetails = $('#pickupDetails');
-    var $dropoffDetails = $('#dropoffDetails');
+        function calculateTotalPrice(car, pickupDateTime, dropoffDateTime) {
+            const pricingTypeToMinutes = {
+                1: 1,         // Dakika
+                2: 60,        // Saat
+                3: 1440,      // Gün
+                4: 10080,     // Hafta
+                5: 43200      // Ay (30 gün varsayımı)
+            };
 
-    var $pickupDate = $('#pickupDate');
-    var $dropoffDate = $('#dropoffDate');
-    var $pickupTime = $('#pickupTime');
-    var $dropoffTime = $('#dropoffTime');
+            let totalMinutes = Math.floor((dropoffDateTime - pickupDateTime) / (1000 * 60));
+            let totalPrice = 0;
 
-    var $pickupDateError = $('#pickupDateError');
-    var $dropoffDateError = $('#dropoffDateError');
-    var $pickupTimeError = $('#pickupTimeError');
-    var $dropoffTimeError = $('#dropoffTimeError');
+            if (!Array.isArray(car.pricings) || !Array.isArray(car.carPricings)) return 0;
 
-    function resetTimeConstraintsForPickup(loc) {
-        if (!loc || !loc.StartTime || !loc.EndTime) {
-            $pickupTime.attr('min', null).attr('max', null).val('');
-            return;
+            let sortedPricings = [...car.pricings].sort((a, b) => {
+                if (b.pricingType === a.pricingType) {
+                    return b.quantity - a.quantity;
+                }
+                return b.pricingType - a.pricingType;
+            });
+
+            sortedPricings.forEach(pricing => {
+                let unitMinutes = pricingTypeToMinutes[pricing.pricingType] * pricing.quantity;
+                if (totalMinutes >= unitMinutes && unitMinutes > 0) {
+                    let count = Math.floor(totalMinutes / unitMinutes);
+                    totalMinutes -= count * unitMinutes;
+
+                    let carPricing = car.carPricings.find(cp => cp.pricingId === pricing.pricingId);
+                    if (carPricing && typeof carPricing.amount !== 'undefined') {
+                        totalPrice += Number(carPricing.amount) * count;
+                    }
+                }
+            });
+
+            return totalPrice;
         }
-        var start = loc.StartTime.substring(0,5);
-        var end = loc.EndTime.substring(0,5);
-        $pickupTime.attr('min', start);
-        $pickupTime.attr('max', end);
-        if ($pickupTime.val()) {
-            if (!timeWithinRange($pickupTime.val(), loc.StartTime, loc.EndTime)) {
+
+        function resetTimeConstraintsForPickup(loc) {
+            if (!loc || !loc.StartTime || !loc.EndTime) {
+                $pickupTime.attr('min', null).attr('max', null).val('');
+                return;
+            }
+            var start = loc.StartTime.substring(0,5);
+            var end = loc.EndTime.substring(0,5);
+            $pickupTime.attr('min', start);
+            $pickupTime.attr('max', end);
+            if ($pickupTime.val() && !timeWithinRange($pickupTime.val(), loc.StartTime, loc.EndTime)) {
                 $pickupTime.val('');
             }
         }
-    }
 
-    function resetTimeConstraintsForDropoff(loc) {
-        if (!loc || !loc.StartTime || !loc.EndTime) {
-            $dropoffTime.attr('min', null).attr('max', null).val('');
-            return;
-        }
-        var start = loc.StartTime.substring(0,5);
-        var end = loc.EndTime.substring(0,5);
-        $dropoffTime.attr('min', start);
-        $dropoffTime.attr('max', end);
-        if ($dropoffTime.val()) {
-            if (!timeWithinRange($dropoffTime.val(), loc.StartTime, loc.EndTime)) {
+        function resetTimeConstraintsForDropoff(loc) {
+            if (!loc || !loc.StartTime || !loc.EndTime) {
+                $dropoffTime.attr('min', null).attr('max', null).val('');
+                return;
+            }
+            var start = loc.StartTime.substring(0,5);
+            var end = loc.EndTime.substring(0,5);
+            $dropoffTime.attr('min', start);
+            $dropoffTime.attr('max', end);
+            if ($dropoffTime.val() && !timeWithinRange($dropoffTime.val(), loc.StartTime, loc.EndTime)) {
                 $dropoffTime.val('');
             }
         }
-    }
 
-    function onPickupLocationChange() {
-        var val = $pickupSelect.val();
-        var loc = locations.find(l => l.LocationId == val);
-        if (loc) {
-            $pickupDetails.html(formatLocationDetailsHtml(loc)).show();
-            var today = new Date();
-            var next = getNextAvailableDate(loc, today) || today;
-            var minStr = next.toISOString().slice(0,10);
-            $pickupDate.attr('min', minStr);
+        function onPickupLocationChange() {
+            var val = $pickupSelect.val();
+            var loc = locations.find(l => l.LocationId == val);
+            if (loc) {
+                $pickupDetails.html(formatLocationDetailsHtml(loc)).show();
+                var today = new Date();
+                var next = getNextAvailableDate(loc, today) || today;
+                var minStr = next.toISOString().slice(0,10);
+                $pickupDate.attr('min', minStr);
 
-            var cur = $pickupDate.val();
-            if (!cur || cur < minStr) {
-                $pickupDate.val(minStr);
+                var cur = $pickupDate.val();
+                if (!cur || cur < minStr) $pickupDate.val(minStr);
+
+                resetTimeConstraintsForPickup(loc);
+                updateDropoffMinFromPickup();
+            } else {
+                $pickupDetails.hide().html('');
+                $pickupDate.attr('min', new Date().toISOString().slice(0,10));
+                resetTimeConstraintsForPickup(null);
             }
+            clearErrors();
+        }
 
-            resetTimeConstraintsForPickup(loc);
+        function onDropoffLocationChange() {
+            var val = $dropoffSelect.val();
+            var loc = locations.find(l => l.LocationId == val);
+            if (loc) {
+                $dropoffDetails.html(formatLocationDetailsHtml(loc)).show();
+                updateDropoffMinFromPickup();
+                resetTimeConstraintsForDropoff(loc);
+            } else {
+                $dropoffDetails.hide().html('');
+                $dropoffDate.attr('min', new Date().toISOString().slice(0,10));
+                resetTimeConstraintsForDropoff(null);
+            }
+            clearErrors();
+        }
 
+        function updateDropoffMinFromPickup() {
+            var dropLocVal = $dropoffSelect.val();
+            var dropLoc = locations.find(l => l.LocationId == dropLocVal);
+
+            var pickVal = $pickupDate.val();
+            var startFrom = pickVal ? new Date(pickVal + 'T00:00:00') : new Date();
+            if (dropLoc) {
+                var next = getNextAvailableDate(dropLoc, startFrom) || startFrom;
+                var minStr = next.toISOString().slice(0,10);
+                $dropoffDate.attr('min', minStr);
+
+                var curDrop = $dropoffDate.val();
+                if (!curDrop || curDrop < minStr) $dropoffDate.val(minStr);
+            } else {
+                var fallbackMin = startFrom.toISOString().slice(0,10);
+                $dropoffDate.attr('min', fallbackMin);
+                var curDrop = $dropoffDate.val();
+                if (!curDrop || curDrop < fallbackMin) $dropoffDate.val(fallbackMin);
+            }
+        }
+
+        function clearErrors() {
+            $pickupDateError.hide().text('');
+            $dropoffDateError.hide().text('');
+            $pickupTimeError.hide().text('');
+            $dropoffTimeError.hide().text('');
+        }
+
+        var $pickupSelect = $('#pickupLocation');
+        var $dropoffSelect = $('#dropoffLocation');
+        var $pickupDetails = $('#pickupDetails');
+        var $dropoffDetails = $('#dropoffDetails');
+
+        var $pickupDate = $('#pickupDate');
+        var $dropoffDate = $('#dropoffDate');
+        var $pickupTime = $('#pickupTime');
+        var $dropoffTime = $('#dropoffTime');
+
+        var $pickupDateError = $('#pickupDateError');
+        var $dropoffDateError = $('#dropoffDateError');
+        var $pickupTimeError = $('#pickupTimeError');
+        var $dropoffTimeError = $('#dropoffTimeError');
+
+        var $step1 = $('#step1');
+        var $step2 = $('#step2');
+        var $step3 = $('#step3');
+        var $carsList = $('#carsList');
+        var $nextStep2 = $('#nextStep2');
+        var selectedCarId = null;
+        var carsCache = {};
+
+        (function initDates() {
+            var today = new Date().toISOString().slice(0,10);
+            $pickupDate.attr('min', today);
+            $dropoffDate.attr('min', today);
+        })();
+
+        $pickupSelect.on('change', onPickupLocationChange);
+        $dropoffSelect.on('change', onDropoffLocationChange);
+
+        $pickupDate.on('change', function () {
+            clearErrors();
+            var val = $(this).val();
+            if (!val) return;
+            var locVal = $pickupSelect.val();
+            var loc = locations.find(l => l.LocationId == locVal);
+            if (loc) {
+                var d = new Date(val + 'T00:00:00');
+                if (!isLocationAvailableOnDate(loc, d)) {
+                    $pickupDateError.show().text('Seçtiğiniz lokasyon bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
+                    $(this).val('');
+                    return;
+                }
+            }
             updateDropoffMinFromPickup();
-        } else {
-            $pickupDetails.hide().html('');
-            $pickupDate.attr('min', new Date().toISOString().slice(0,10));
-            resetTimeConstraintsForPickup(null);
-        }
-        clearErrors();
-    }
+        });
 
-    function onDropoffLocationChange() {
-        var val = $dropoffSelect.val();
-        var loc = locations.find(l => l.LocationId == val);
-        if (loc) {
-            $dropoffDetails.html(formatLocationDetailsHtml(loc)).show();
-
-            updateDropoffMinFromPickup();
-
-            resetTimeConstraintsForDropoff(loc);
-        } else {
-            $dropoffDetails.hide().html('');
-            $dropoffDate.attr('min', new Date().toISOString().slice(0,10));
-            resetTimeConstraintsForDropoff(null);
-        }
-        clearErrors();
-    }
-
-    function updateDropoffMinFromPickup() {
-        var dropLocVal = $dropoffSelect.val();
-        var dropLoc = locations.find(l => l.LocationId == dropLocVal);
-
-        var pickVal = $pickupDate.val();
-        var startFrom = pickVal ? new Date(pickVal + 'T00:00:00') : new Date();
-        if (dropLoc) {
-            var next = getNextAvailableDate(dropLoc, startFrom) || startFrom;
-            var minStr = next.toISOString().slice(0,10);
-            $dropoffDate.attr('min', minStr);
-
-            var curDrop = $dropoffDate.val();
-            if (!curDrop || curDrop < minStr) {
-                $dropoffDate.val(minStr);
+        $dropoffDate.on('change', function () {
+            clearErrors();
+            var val = $(this).val();
+            if (!val) return;
+            var locVal = $dropoffSelect.val();
+            var loc = locations.find(l => l.LocationId == locVal);
+            if (loc) {
+                var d = new Date(val + 'T00:00:00');
+                if (!isLocationAvailableOnDate(loc, d)) {
+                    $dropoffDateError.show().text('Seçtiğiniz teslim lokasyonu bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
+                    $(this).val('');
+                    return;
+                }
             }
-        } else {
-            var fallbackMin = startFrom.toISOString().slice(0,10);
-            $dropoffDate.attr('min', fallbackMin);
-            var curDrop = $dropoffDate.val();
-            if (!curDrop || curDrop < fallbackMin) {
-                $dropoffDate.val(fallbackMin);
-            }
-        }
-    }
-
-    function clearErrors() {
-        $pickupDateError.hide().text('');
-        $dropoffDateError.hide().text('');
-        $pickupTimeError.hide().text('');
-        $dropoffTimeError.hide().text('');
-    }
-
-    $pickupSelect.on('change', onPickupLocationChange);
-    $dropoffSelect.on('change', onDropoffLocationChange);
-
-    $pickupDate.on('change', function () {
-        clearErrors();
-        var val = $(this).val();
-        if (!val) return;
-        var locVal = $pickupSelect.val();
-        var loc = locations.find(l => l.LocationId == locVal);
-        if (loc) {
-            var d = new Date(val + 'T00:00:00');
-            if (!isLocationAvailableOnDate(loc, d)) {
-                $pickupDateError.show().text('Seçtiğiniz lokasyon bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
+            var pick = $pickupDate.val();
+            if (pick && val < pick) {
+                $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
                 $(this).val('');
                 return;
             }
-        }
-        updateDropoffMinFromPickup();
-    });
+        });
 
-    $dropoffDate.on('change', function () {
-        clearErrors();
-        var val = $(this).val();
-        if (!val) return;
-        var locVal = $dropoffSelect.val();
-        var loc = locations.find(l => l.LocationId == locVal);
-        if (loc) {
-            var d = new Date(val + 'T00:00:00');
-            if (!isLocationAvailableOnDate(loc, d)) {
-                $dropoffDateError.show().text('Seçtiğiniz teslim lokasyonu bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
+        $pickupTime.on('change', function () {
+            clearErrors();
+            var t = $(this).val();
+            var locVal = $pickupSelect.val();
+            var loc = locations.find(l => l.LocationId == locVal);
+            if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
+                $pickupTimeError.show().text('Seçtiğiniz saat, alış lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
                 $(this).val('');
                 return;
             }
-        }
-        var pick = $pickupDate.val();
-        if (pick && val < pick) {
-            $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
-            $(this).val('');
-            return;
-        }
-    });
+        });
 
-    $pickupTime.on('change', function () {
-        clearErrors();
-        var t = $(this).val();
-        var locVal = $pickupSelect.val();
-        var loc = locations.find(l => l.LocationId == locVal);
-        if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
-            $pickupTimeError.show().text('Seçtiğiniz saat, alış lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
-            $(this).val('');
-            return;
-        }
-    });
+        $dropoffTime.on('change', function () {
+            clearErrors();
+            var t = $(this).val();
+            var locVal = $dropoffSelect.val();
+            var loc = locations.find(l => l.LocationId == locVal);
+            if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
+                $dropoffTimeError.show().text('Seçtiğiniz saat, teslim lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
+                $(this).val('');
+                return;
+            }
+        });
 
-    $dropoffTime.on('change', function () {
-        clearErrors();
-        var t = $(this).val();
-        var locVal = $dropoffSelect.val();
-        var loc = locations.find(l => l.LocationId == locVal);
-        if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
-            $dropoffTimeError.show().text('Seçtiğiniz saat, teslim lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
-            $(this).val('');
-            return;
-        }
-    });
+        $('#nextStep').off('click').on('click', function() {
+            clearErrors();
 
-    // 2. adım elemanları
-    var $step1 = $('#step1');
-    var $step2 = $('#step2');
-    var $carsList = $('#carsList');
-    var $nextStep2 = $('#nextStep2');
-    var selectedCarId = null;
+            var pickLocId = $pickupSelect.val();
+            var dropLocId = $dropoffSelect.val();
+            var pickDate = $pickupDate.val();
+            var dropDate = $dropoffDate.val();
+            var pickTime = $pickupTime.val();
+            var dropTime = $dropoffTime.val();
 
-    // 1. adım ileri butonu (önceki submit kaldırıldı, yeni davranış ekleniyor)
-    $('#nextStep').off('click').on('click', function() {
-        clearErrors();
+            if (!pickLocId) { alert('Lütfen alış lokasyonu seçin.'); return; }
+            if (!dropLocId) { alert('Lütfen teslim lokasyonu seçin.'); return; }
+            if (!pickDate) { $pickupDateError.show().text('Lütfen alış tarihini seçin.'); return; }
+            if (!dropDate) { $dropoffDateError.show().text('Lütfen teslim tarihini seçin.'); return; }
+            if (!pickTime) { $pickupTimeError.show().text('Lütfen alış saatini seçin.'); return; }
+            if (!dropTime) { $dropoffTimeError.show().text('Lütfen teslim saatini seçin.'); return; }
 
-        var pickLocId = $pickupSelect.val();
-        var dropLocId = $dropoffSelect.val();
-        var pickDate = $pickupDate.val();
-        var dropDate = $dropoffDate.val();
-        var pickTime = $pickupTime.val();
-        var dropTime = $dropoffTime.val();
+            var pickLoc = locations.find(l => l.LocationId == pickLocId);
+            var dropLoc = locations.find(l => l.LocationId == dropLocId);
 
-        if (!pickLocId) { alert('Lütfen alış lokasyonu seçin.'); return; }
-        if (!dropLocId) { alert('Lütfen teslim lokasyonu seçin.'); return; }
-        if (!pickDate) { $pickupDateError.show().text('Lütfen alış tarihini seçin.'); return; }
-        if (!dropDate) { $dropoffDateError.show().text('Lütfen teslim tarihini seçin.'); return; }
-        if (!pickTime) { $pickupTimeError.show().text('Lütfen alış saatini seçin.'); return; }
-        if (!dropTime) { $dropoffTimeError.show().text('Lütfen teslim saatini seçin.'); return; }
+            var pd = new Date(pickDate + 'T00:00:00');
+            if (!isLocationAvailableOnDate(pickLoc, pd)) {
+                $pickupDateError.show().text('Alış lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
+                return;
+            }
 
-        var pickLoc = locations.find(l => l.LocationId == pickLocId);
-        var dropLoc = locations.find(l => l.LocationId == dropLocId);
+            var dd = new Date(dropDate + 'T00:00:00');
+            if (!isLocationAvailableOnDate(dropLoc, dd)) {
+                $dropoffDateError.show().text('Teslim lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
+                return;
+            }
 
-        var pd = new Date(pickDate + 'T00:00:00');
-        if (!isLocationAvailableOnDate(pickLoc, pd)) {
-            $pickupDateError.show().text('Alış lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
-            return;
-        }
+            if (!timeWithinRange(pickTime, pickLoc.StartTime, pickLoc.EndTime)) {
+                $pickupTimeError.show().text('Alış saati lokasyonun çalışma saatleri arasında olmalı.');
+                return;
+            }
+            if (!timeWithinRange(dropTime, dropLoc.StartTime, dropLoc.EndTime)) {
+                $dropoffTimeError.show().text('Teslim saati lokasyonun çalışma saatleri arasında olmalı.');
+                return;
+            }
 
-        var dd = new Date(dropDate + 'T00:00:00');
-        if (!isLocationAvailableOnDate(dropLoc, dd)) {
-            $dropoffDateError.show().text('Teslim lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
-            return;
-        }
+            if (dropDate < pickDate) {
+                $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
+                return;
+            }
 
-        if (!timeWithinRange(pickTime, pickLoc.StartTime, pickLoc.EndTime)) {
-            $pickupTimeError.show().text('Alış saati lokasyonun çalışma saatleri arasında olmalı.');
-            return;
-        }
-        if (!timeWithinRange(dropTime, dropLoc.StartTime, dropLoc.EndTime)) {
-            $dropoffTimeError.show().text('Teslim saati lokasyonun çalışma saatleri arasında olmalı.');
-            return;
-        }
+            $step1.hide();
+            $step2.show();
 
-        if (dropDate < pickDate) {
-            $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
-            return;
-        }
+            fetchAvailableCars(pickLocId);
+        });
 
-        // 1. adımı gizle, 2. adımı göster
-        $step1.hide();
-        $step2.show();
+        function fetchAvailableCars(locationId) {
+            $carsList.html('<p>Yükleniyor...</p>');
+            $nextStep2.prop('disabled', true);
+            selectedCarId = null;
+            carsCache = {}; // temizle
 
-        // Araçları getir
-        fetchAvailableCars(pickLocId);
-    });
+            $.ajax({
+                url: `/Reservation/GetAvailableCars?locationId=${locationId}`,
+                method: 'GET',
+                success: function(data) {
+                    if (!data || !data.length) {
+                        $carsList.html('<p>Seçilen lokasyonda uygun araç bulunamadı.</p>');
+                        return;
+                    }
 
-    function fetchAvailableCars(locationId) {
-        $carsList.html('<p>Yükleniyor...</p>');
-        $nextStep2.prop('disabled', true);
-        selectedCarId = null;
-
-        $.ajax({
-            url: `/Reservation/GetAvailableCars?locationId=${locationId}`,
-            method: 'GET',
-            success: function(data) {
-                if (data && data.length) {
                     $carsList.empty();
+
+                    var pickDateVal = $pickupDate.val();
+                    var pickTimeVal = $pickupTime.val();
+                    var dropDateVal = $dropoffDate.val();
+                    var dropTimeVal = $dropoffTime.val();
+
+                    var pickupDateTime = null;
+                    var dropoffDateTime = null;
+                    if (pickDateVal && pickTimeVal && dropDateVal && dropTimeVal) {
+                        pickupDateTime = new Date(pickDateVal + 'T' + pickTimeVal + ':00');
+                        dropoffDateTime = new Date(dropDateVal + 'T' + dropTimeVal + ':00');
+                        if (isNaN(pickupDateTime.getTime()) || isNaN(dropoffDateTime.getTime())) {
+                            pickupDateTime = null;
+                            dropoffDateTime = null;
+                        }
+                    }
+                    var validRange = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime;
+
                     data.forEach(function(car) {
+                        carsCache[car.carId] = car;
+
+                        var dailyPricing = (car.pricings || []).find(p => p.pricingType === 3 && p.quantity === 1);
+                        var dailyPrice = null;
+                        if (dailyPricing && Array.isArray(car.carPricings)) {
+                            var carPricing = car.carPricings.find(cp => cp.pricingId === dailyPricing.pricingId);
+                            if (carPricing && typeof carPricing.amount !== 'undefined') {
+                                dailyPrice = Number(carPricing.amount);
+                            }
+                        }
+
+                        var totalPrice = null;
+                        if (validRange) {
+                            try {
+                                totalPrice = calculateTotalPrice(car, pickupDateTime, dropoffDateTime);
+                                if (isNaN(totalPrice) || totalPrice < 0) totalPrice = null;
+                            } catch (err) {
+                                console.error('Fiyat hesaplama hatası:', err);
+                                totalPrice = null;
+                            }
+                        }
+
+                        $("#selectedCarPrice").val(totalPrice);
+
                         var cardHtml = `
-                        <div class="col-md-4 mb-3">
-                          <div class="card car-card" data-carid="${car.carId}" style="cursor:pointer;">
-                            <img src="${car.coverImageUrl}" class="card-img-top" alt="${car.model}">
-                            <div class="card-body">
-                              <h5 class="card-title">${car.brand.name} - ${car.model}</h5>
-                              <p class="card-text">
-                                Yıl: ${car.year}<br/>
-                                Koltuk: ${car.seat}<br/>
-                                Vites: ${car.transmission === 1 ? 'Manuel' : 'Otomatik'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>`;
+                            <div class="col-md-4 mb-3">
+                              <div class="card car-card h-100" data-carid="${car.carId}" style="cursor:pointer; transition: transform 0.2s;">
+                                <img src="${car.coverImageUrl || '/images/no-image.png'}" class="card-img-top" alt="${car.model || ''}">
+                                <div class="card-body d-flex flex-column">
+                                  <h5 class="card-title mb-2">${(car.brand && car.brand.name) ? car.brand.name : '-'} - ${car.model || '-'}</h5>
+
+                                  <div class="mb-1"><strong>Vites:</strong> ${car.transmission === 1 ? 'Manuel' : (car.transmission === 2 ? 'Otomatik' : '-')}</div>
+                                  <div class="mb-1"><strong>Bagaj:</strong> ${car.luggage ?? '-'} Bagaj</div>
+                                  <div class="mb-1"><strong>Koltuk:</strong> ${car.seat ?? '-'} Koltuk</div>
+                                  <div class="mb-1"><strong>Sınıf:</strong> ${car.carClass?.className || '-'}</div>
+
+                                  <div class="mt-auto">
+                                    <p class="card-text text-success fw-bold mb-1">
+                                      ${dailyPrice !== null ? `Günlük: ${Number(dailyPrice).toLocaleString('tr-TR')} TL` : '<span class="text-muted">Günlük fiyat: bilgi yok</span>'}
+                                    </p>
+                                    <p class="card-text text-primary fw-bold mb-2">
+                                      ${totalPrice !== null ? `Toplam: ${Number(totalPrice).toLocaleString('tr-TR')} TL`
+                                                           : (validRange ? '<span class="text-muted">Toplam hesaplanamadı</span>'
+                                                                          : '<span class="text-muted">Tarih/Saat seçimi yapınız</span>')}
+                                    </p>
+
+                                    <div class="d-grid gap-2">
+                                      <button class="btn btn-sm btn-outline-primary car-detail-btn" data-carid="${car.carId}">Araç Detayı</button>
+                                      <button class="btn btn-sm btn-outline-success select-car-btn" data-carid="${car.carId}">Bu Aracı Seç</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>`;
+
                         $carsList.append(cardHtml);
                     });
 
-                    // Araç kartlarına tıklama eventi
-                    $('.car-card').on('click', function() {
-                        $('.car-card').removeClass('border-primary');
-                        $(this).addClass('border-primary');
-                        selectedCarId = $(this).data('carid');
-                        $nextStep2.prop('disabled', false);
-                    });
-                } else {
-                    $carsList.html('<p>Seçilen lokasyonda uygun araç bulunamadı.</p>');
+                    $('.car-card').hover(
+                        function() { $(this).css('transform', 'scale(1.05)').css('z-index','5'); },
+                        function() { $(this).css('transform', 'scale(1)').css('z-index','1'); }
+                    );
+                },
+                error: function() {
+                    $carsList.html('<p>Araçlar yüklenirken hata oluştu.</p>');
                 }
-            },
-            error: function() {
-                $carsList.html('<p>Araçlar yüklenirken hata oluştu.</p>');
+            });
+        }
+
+        $(document).on('click', '.car-detail-btn', function () {
+            var carId = $(this).data('carid');
+            var car = carsCache[carId];
+            if (!car) return;
+
+            $('#detailImage').attr('src', car.bigImageUrl || car.coverImageUrl || '/images/no-image.png');
+            $('#detailTitle').text(`${car.brand?.name || '-'} ${car.model || '-'}`);
+            $('#detailStock').text(car.stockNumber || '-');
+            $('#detailClass').text(car.carClass?.className || '-');
+            $('#detailLocation').text(car.locationName || '-');
+            $('#detailYear').text(car.year || '-');
+            $('#detailTransmission').text(car.transmission === 1 ? 'Manuel' : (car.transmission === 2 ? 'Otomatik' : '-'));
+            $('#detailFuel').text(car.fuel === 1 ? 'Benzin' : car.fuel === 2 ? 'Dizel' : 'Diğer');
+            $('#detailSeat').text(car.seat ? (car.seat + ' Koltuk') : '-');
+            $('#detailLuggage').text(car.luggage ? (car.luggage + ' Bagaj') : '-');
+
+            if (car.featureNames && car.featureNames.length) {
+                $('#detailFeaturesWrapper').show();
+                $('#detailFeatures').empty();
+                car.featureNames.forEach(function (feature) {
+                    $('#detailFeatures').append(`<div class="col-md-3 mb-2"><span class="text-success fw-bold">•</span> ${feature}</div>`);
+                });
+            } else {
+                $('#detailFeaturesWrapper').hide();
+            }
+
+            $('#detailDescription').text(car.description || '');
+
+            $('#carDetailModal').modal('show');
+        });
+
+        $(document).on('click', '.select-car-btn', function () {
+            var carId = $(this).data('carid');
+            if (!carId) return;
+
+            $('.car-card').removeClass('border-primary');
+            $(`.car-card[data-carid="${carId}"]`).addClass('border-primary');
+
+            selectedCarId = carId;
+            $nextStep2.prop('disabled', false);
+            $("#selectedCarId").val(carId);
+        });
+
+        $nextStep2.off('click').on('click', function () {
+            if (!selectedCarId) {
+                alert('Lütfen bir araç seçin.');
+                return;
+            }
+
+            if ($('#selectedCarId').length === 0) {
+                $('<input>').attr({ type: 'hidden', id: 'selectedCarId', name: 'SelectedCarId', value: selectedCarId }).appendTo($('#reservationForm'));
+            } else {
+                $('#selectedCarId').val(selectedCarId);
+            }
+
+            $step2.hide();
+            $step3.show();
+
+            $('html, body').animate({ scrollTop: $step3.offset().top - 20 }, 300);
+        });
+
+        $('#backToStep1').on('click', function () {
+            $step2.hide();
+            $step1.show();
+        });
+
+        $(document).on('click', '#backToStep2', function () {
+            $step3.hide();
+            $step2.show();
+        });
+
+        $(document).on('click', '.mileage-card', function () {
+            $('.mileage-card').removeClass('border-primary shadow');
+            $(this).addClass('border-primary shadow');
+
+            $("#selectedMileagePackageId").val($(this).data("id"));
+            $("#nextStep3").prop("disabled", false);
+        });
+
+        $(document).on('click', '#finishReservation', function () {
+            let carPrice = parseFloat($("#selectedCarPrice").val()) || 0;
+            let mileagePrice = parseFloat($(".mileage-card.shadow").data("amount")) || 0;
+            let securityPrice = parseFloat($(".security-card.shadow").data("amount")) || 0;
+            let totalAmount = carPrice + mileagePrice + securityPrice;
+
+            console.log('carPrice:', carPrice);
+            console.log('mileagePrice:', mileagePrice);
+            console.log('securityPrice:', securityPrice);
+
+            let reservationData = {
+                PickUpLocationId: $("#pickupLocation").val(),
+                DropOffLocationId: $("#dropoffLocation").val(),
+                PickUpDate: $("#pickupDate").val(),
+                DropOffDate: $("#dropoffDate").val(),
+                PickUpTime: $("#pickupTime").val(),
+                DropOffTime: $("#dropoffTime").val(),
+                CarId: $("#selectedCarId").val(),
+                MileagePackageId: $("#selectedMileagePackageId").val(),
+                SecurityPackageId: $("#selectedSecurityPackageId").val(),
+                TotalAmount: totalAmount
+            };
+
+            console.log("Gönderilecek rezervasyon verisi:", reservationData);
+
+            $.ajax({
+                url: '/Reservation/CreateReservation',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(reservationData),
+                success: function (response) {
+                    alert("Rezervasyon başarıyla oluşturuldu!");
+                },
+                error: function (xhr) {
+                    alert("Rezervasyon sırasında bir hata oluştu.");
+                }
+            });
+        });
+
+        $(document).on('keydown', '.mileage-card', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                $(this).trigger('click');
             }
         });
-    }
 
-    // 2. adım ileri butonu
-    $nextStep2.on('click', function() {
-        if (!selectedCarId) {
-            alert('Lütfen bir araç seçin.');
-            return;
-        }
-        // Seçilen araç ID'sini form'a gizli input olarak ekle
-        if ($('#selectedCarId').length === 0) {
-            $('<input>').attr({
-                type: 'hidden',
-                id: 'selectedCarId',
-                name: 'SelectedCarId',
-                value: selectedCarId
-            }).appendTo($('#reservationForm'));
-        } else {
-            $('#selectedCarId').val(selectedCarId);
-        }
-        // Formu submit et
-        $('#reservationForm').submit();
+        $(document).on('click', '#nextStep3', function () {
+            if ($("#selectedMileagePackageId").val() === "") {
+                alert("Lütfen bir kilometre paketi seçin.");
+                return;
+            }
+            $("#step3").hide();
+            $("#step4").show();
+        });
+
+        $(".security-card").click(function () {
+            $(".security-card").removeClass("border-primary shadow");
+            $(this).addClass("border-primary shadow");
+            $("#selectedSecurityPackageId").val($(this).data("id"));
+            $("#finishReservation").prop("disabled", false);
+        });
+
+        $("#backToStep3").click(function () {
+            $("#step4").hide();
+            $("#step3").show();
+        });
+
     });
-
-    // Geri butonu ile 1. adıma dön
-    $('#backToStep1').on('click', function() {
-        $step2.hide();
-        $step1.show();
-    });
-
-    // Sayfa açılırken min tarih = bugün
-    $(function () {
-        var today = new Date().toISOString().slice(0,10);
-        $pickupDate.attr('min', today);
-        $dropoffDate.attr('min', today);
-    });
-
 </script>
-
-<style>
-    /* Seçili araç kartına border koy */
-    .car-card.border-primary {
-        border: 3px solid #007bff;
-    }
-</style>
