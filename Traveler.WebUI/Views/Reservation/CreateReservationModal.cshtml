@@ -912,6 +912,7 @@
                 data: JSON.stringify(reservationData),
                 success: function (response) {
                     alert("Rezervasyon başarıyla oluşturuldu!");
+                    window.location.href = "/Home/Index";
                 },
                 error: function (xhr) {
                     alert("Rezervasyon sırasında bir hata oluştu.");

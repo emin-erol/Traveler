@@ -62,17 +62,11 @@ namespace Traveler.WebApi.Controllers
         {
             var car = new Car
             {
-                BigImageUrl = model.BigImageUrl,
-                BrandId = model.BrandId,
+                ModelId = model.ModelId,
                 StockNumber = model.StockNumber,
-                CarClassId = model.CarClassId,
-                CoverImageUrl = model.CoverImageUrl,
                 Description = model.Description,
                 Fuel = model.Fuel,
-                Luggage = model.Luggage,
                 Mileage = model.Mileage,
-                Model = model.Model,
-                Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
                 Status = model.Status,
@@ -80,6 +74,7 @@ namespace Traveler.WebApi.Controllers
                 CreatedTime = model.CreatedTime,
                 UpdatedTime = model.UpdatedTime,
                 LastUsedTime = model.LastUsedTime,
+                LicensePlate = model.LicensePlate,
             };
 
             await _carDal.CreateAsync(car);
@@ -93,17 +88,11 @@ namespace Traveler.WebApi.Controllers
             var car = new Car
             {
                 CarId = model.CarId,
-                BigImageUrl = model.BigImageUrl,
-                BrandId = model.BrandId,
-                CarClassId = model.CarClassId,
-                CoverImageUrl = model.CoverImageUrl,
+                ModelId = model.ModelId,
                 Description = model.Description,
                 StockNumber = model.StockNumber,
                 Fuel = model.Fuel,
-                Luggage = model.Luggage,
                 Mileage = model.Mileage,
-                Model = model.Model,
-                Seat = model.Seat,
                 Transmission = model.Transmission,
                 Year = model.Year,
                 Status = model.Status,
@@ -111,6 +100,7 @@ namespace Traveler.WebApi.Controllers
                 CreatedTime = model.CreatedTime,
                 UpdatedTime = model.UpdatedTime,
                 LastUsedTime = model.LastUsedTime,
+                LicensePlate = model.LicensePlate,
             };
 
             await _carDal.UpdateAsync(car);

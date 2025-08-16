@@ -32,6 +32,7 @@ namespace Traveler.Persistence.Context
         public DbSet<PackageOption> PackageOptions { get; set; }
         public DbSet<SecurityPackageOption> SecurityPackageOptions { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Model> Models { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

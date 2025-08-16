@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.Application.Dtos.BrandDtos;
 using Traveler.Application.Dtos.CarClassDtos;
 using Traveler.Application.Dtos.CarPricingDtos;
+using Traveler.Application.Dtos.ModelDtos;
 using Traveler.Application.Dtos.PricingDtos;
-using Traveler.Domain.Entities;
 
 namespace Traveler.Application.Dtos.CarDtos
 {
@@ -15,19 +14,14 @@ namespace Traveler.Application.Dtos.CarDtos
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
-        public string Model { get; set; }
         public int Year { get; set; }
-        public string CoverImageUrl { get; set; }
         public int Mileage { get; set; }
         public int Transmission { get; set; }
-        public byte Seat { get; set; }
-        public byte Luggage { get; set; }
         public int Fuel { get; set; }
-        public string BigImageUrl { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
-        public BrandDto Brand { get; set; }
-        public CarClassDto CarClass { get; set; }
+        public string LicensePlate { get; set; }
+        public ModelDto Model { get; set; }
         public List<string> FeatureNames { get; set; }
         public string LocationName { get; set; }
         public DateTime CreatedTime { get; set; }

@@ -11,6 +11,6 @@ namespace Traveler.Domain.Entities
         public int CarClassId { get; set; }
         public string ClassName { get; set; }
 
-        public List<Car> Cars { get; set; }
+        public List<Model> Models { get; set; }
     }
 }

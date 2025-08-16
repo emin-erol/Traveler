@@ -50,6 +50,9 @@ namespace Traveler.WebApi.Controllers
                 ReservationCode = dto.ReservationCode,
                 SecurityPackageId = dto.SecurityPackageId,
                 TotalAmount = dto.TotalAmount,
+                CreatedTime = dto.CreatedTime,
+                UpdatedTime = dto.UpdatedTime,
+                UserId = dto.UserId,
             };
 
             await _reservationDal.CreateAsync(reservation);
@@ -75,6 +78,9 @@ namespace Traveler.WebApi.Controllers
                 ReservationCode = dto.ReservationCode,
                 SecurityPackageId = dto.SecurityPackageId,
                 TotalAmount = dto.TotalAmount,
+                CreatedTime = dto.CreatedTime,
+                UpdatedTime = dto.UpdatedTime,
+                UserId = dto.UserId,
             };
 
             await _reservationDal.UpdateAsync(reservation);

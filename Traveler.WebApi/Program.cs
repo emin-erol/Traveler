@@ -50,6 +50,7 @@ builder.Services.AddScoped<IPackageOptionDal, PackageOptionRepository>();
 builder.Services.AddScoped<ISecurityPackageDal, SecurityPackageRepository>();
 builder.Services.AddScoped<ISecurityPackageOptionDal, SecurityPackageOptionRepository>();
 builder.Services.AddScoped<IReservationDal, ReservationRepository>();
+builder.Services.AddScoped<IModelDal, ModelRepository>();
 
 var app = builder.Build();
 

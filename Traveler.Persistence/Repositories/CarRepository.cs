@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using Traveler.Application.Dtos.BrandDtos;
 using Traveler.Application.Dtos.CarClassDtos;
 using Traveler.Application.Dtos.CarDtos;
 using Traveler.Application.Dtos.CarPricingDtos;
+using Traveler.Application.Dtos.ModelDtos;
 using Traveler.Application.Dtos.PricingDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
@@ -51,17 +53,33 @@ namespace Traveler.Persistence.Repositories
         public async Task<List<GetCarWithBrandAndClassDto>> GetCarsWithBrandAndClass()
         {
             var result = await _context.Cars
-                .Include(c => c.Brand)
-                .Include(c => c.CarClass)
+                .Include(c => c.Model)
+                    .ThenInclude(m => m.Brand)
+                .Include(c => c.Model.CarClass)
                 .Select(c => new GetCarWithBrandAndClassDto
                 {
                     CarId = c.CarId,
                     StockNumber = c.StockNumber,
-                    Model = c.Model,
-                    BrandId = c.BrandId,
-                    BrandName = c.Brand.Name,
-                    ClassId = c.CarClassId,
-                    ClassName = c.CarClass.ClassName
+                    Model = new ModelDto
+                    {
+                        ModelId = c.Model.ModelId,
+                        ModelName = c.Model.ModelName,
+                        ModelDescription = c.Model.ModelDescription,
+                        CoverImageUrl = c.Model.CoverImageUrl,
+                        Seat = c.Model.Seat,
+                        Luggage = c.Model.Luggage,
+                        BigImageUrl = c.Model.BigImageUrl,
+                        Brand = new BrandDto
+                        {
+                            BrandId = c.Model.Brand.BrandId,
+                            Name = c.Model.Brand.Name
+                        },
+                        CarClass = new CarClassDto
+                        {
+                            CarClassId = c.Model.CarClass.CarClassId,
+                            ClassName = c.Model.CarClass.ClassName
+                        }
+                    }
                 })
                 .ToListAsync();
 
@@ -71,8 +89,9 @@ namespace Traveler.Persistence.Repositories
         public async Task<GetCarWithAllDetailsDto> GetCarWithAllDetails(int carId)
         {
             var car = await _context.Cars
-                .Include(c => c.Brand)
-                .Include(c => c.CarClass)
+                .Include(c => c.Model)
+                    .ThenInclude(m => m.Brand)
+                .Include(c => c.Model.CarClass)
                 .Include(c => c.Location)
                 .FirstOrDefaultAsync(c => c.CarId == carId);
 
@@ -88,15 +107,10 @@ namespace Traveler.Persistence.Repositories
             {
                 CarId = car.CarId,
                 StockNumber = car.StockNumber,
-                Model = car.Model,
                 Year = car.Year,
-                CoverImageUrl = car.CoverImageUrl,
                 Mileage = car.Mileage,
                 Transmission = car.Transmission,
-                Seat = car.Seat,
-                Luggage = car.Luggage,
                 Fuel = car.Fuel,
-                BigImageUrl = car.BigImageUrl,
                 Description = car.Description,
                 Status = car.Status,
                 FeatureNames = featureNames,
@@ -104,15 +118,26 @@ namespace Traveler.Persistence.Repositories
                 CreatedTime = car.CreatedTime,
                 LastUsedTime = car.LastUsedTime,
                 UpdatedTime = car.UpdatedTime,
-                Brand = new BrandDto
+                LicensePlate = car.LicensePlate,
+                Model = new ModelDto
                 {
-                    BrandId = car.Brand.BrandId,
-                    Name = car.Brand.Name
-                },
-                CarClass = new CarClassDto
-                {
-                    CarClassId = car.CarClass.CarClassId,
-                    ClassName = car.CarClass.ClassName
+                    ModelId = car.Model.ModelId,
+                    ModelName = car.Model.ModelName,
+                    ModelDescription = car.Model.ModelDescription,
+                    CoverImageUrl = car.Model.CoverImageUrl,
+                    Seat = car.Model.Seat,
+                    Luggage = car.Model.Luggage,
+                    BigImageUrl = car.Model.BigImageUrl,
+                    Brand = new BrandDto
+                    {
+                        BrandId = car.Model.Brand.BrandId,
+                        Name = car.Model.Brand.Name
+                    },
+                    CarClass = new CarClassDto
+                    {
+                        CarClassId = car.Model.CarClass.CarClassId,
+                        ClassName = car.Model.CarClass.ClassName
+                    }
                 }
             };
         }
@@ -120,8 +145,10 @@ namespace Traveler.Persistence.Repositories
         public async Task<List<GetCarWithAllDetailsDto>> GetCarsWithAllDetailsByLocation(int locationId)
         {
             var cars = await _context.Cars
-                .Include(c => c.Brand)
-                .Include(c => c.CarClass)
+                .Include(c => c.Model)
+                .Include(c => c.Model)
+                    .ThenInclude(m => m.Brand)
+                .Include(c => c.Model.CarClass)
                 .Include(c => c.Location)
                 .Include(c => c.CarFeatures).ThenInclude(cf => cf.Feature)
                 .Include(c => c.CarPricings).ThenInclude(cp => cp.Pricing)
@@ -129,7 +156,7 @@ namespace Traveler.Persistence.Repositories
                 .ToListAsync();
 
             var filteredCars = cars
-                .GroupBy(c => new { c.BrandId, c.Model })
+                .GroupBy(c => new { c.Model.Brand.BrandId, c.Model })
                 .Select(g => g.OrderBy(c => c.LastUsedTime).First())
                 .ToList();
 
@@ -137,26 +164,32 @@ namespace Traveler.Persistence.Repositories
             {
                 CarId = c.CarId,
                 StockNumber = c.StockNumber,
-                Model = c.Model,
                 Year = c.Year,
-                CoverImageUrl = c.CoverImageUrl,
                 Mileage = c.Mileage,
                 Transmission = c.Transmission,
-                Seat = c.Seat,
-                Luggage = c.Luggage,
                 Fuel = c.Fuel,
-                BigImageUrl = c.BigImageUrl,
                 Description = c.Description,
                 Status = c.Status,
-                Brand = new BrandDto
+                LicensePlate = c.LicensePlate,
+                Model = new ModelDto
                 {
-                    BrandId = c.Brand.BrandId,
-                    Name = c.Brand.Name
-                },
-                CarClass = new CarClassDto
-                {
-                    CarClassId = c.CarClass.CarClassId,
-                    ClassName = c.CarClass.ClassName
+                    ModelId = c.Model.ModelId,
+                    ModelName = c.Model.ModelName,
+                    ModelDescription = c.Model.ModelDescription,
+                    CoverImageUrl = c.Model.CoverImageUrl,
+                    Seat = c.Model.Seat,
+                    Luggage = c.Model.Luggage,
+                    BigImageUrl = c.Model.BigImageUrl,
+                    Brand = new BrandDto
+                    {
+                        BrandId = c.Model.Brand.BrandId,
+                        Name = c.Model.Brand.Name
+                    },
+                    CarClass = new CarClassDto
+                    {
+                        CarClassId = c.Model.CarClass.CarClassId,
+                        ClassName = c.Model.CarClass.ClassName
+                    }
                 },
                 FeatureNames = c.CarFeatures?.Select(cf => cf.Feature.FeatureName).ToList() ?? new List<string>(),
                 LocationName = c.Location?.LocationName!,
