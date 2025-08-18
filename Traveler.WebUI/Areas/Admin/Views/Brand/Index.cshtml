@@ -1,4 +1,4 @@
-﻿@model List<GetCarsWithBrandAndClassViewModel>
+﻿@model List<ResultBrandViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,20 +12,16 @@
             <div class="col-xl-12">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Araçlar</h4>
+                        <h4 class="card-title">Marka ve Modeller</h4>
                         <p class="card-subtitle mb-4">
-                            Araçlar ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                            Marka ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
                         </p>
                         <div class="table-responsive">
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Stok No</th>
                                         <th>Marka</th>
-                                        <th>Model</th>
-                                        <th>Sınıf</th>
-                                        <th>Detay</th>
                                         <th>Sil</th>
                                         <th>Güncelle</th>
                                     </tr>
@@ -36,22 +32,14 @@
                                         count++;
                                         <tr>
                                             <td>@count</td>
-                                            <td>@item.StockNumber</td>
-                                            <td>@item.Model.Brand.Name</td>
-                                            <td>@item.Model.ModelName</td>
-                                            <td>@item.Model.CarClass.ClassName</td>
+                                            <td>@item.Name</td>
                                             <td>
-                                                <a href="/Admin/Car/CarDetail/@item.CarId" class="btn btn-sm btn-warning">
-                                                    <i class="fa-solid fa-ellipsis"></i>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="/Car/RemoveCar/@item.CarId" class="btn btn-sm btn-danger">
+                                                <a href="/Admin/Brand/RemoveBrand/@item.BrandId" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </a>
                                             </td>
                                             <td>
-                                                <a href="/Admin/Car/UpdateCarModal/@item.CarId" class="btn btn-sm btn-info">
+                                                <a href="/Admin/Brand/UpdateBrandModal/@item.BrandId" class="btn btn-sm btn-info">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             </td>
@@ -60,7 +48,7 @@
                                 </tbody>
                             </table>
 
-                            <a href="/Admin/Car/CreateCarModal" class="m-3 btn btn-outline-primary">Araç Ekle</a>
+                            <a href="/Admin/Brand/CreateBrandModal" class="m-3 btn btn-outline-primary">Marka Ekle</a>
                         </div>
                     </div>
                 </div>

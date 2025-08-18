@@ -9,14 +9,15 @@
     <div class="card shadow-lg" style="margin-top: 100px;">
         <div class="row g-0">
             <div class="col-md-6">
-                <img src="@Model.BigImageUrl" alt="Araç Resmi" class="img-fluid rounded-start w-100 h-100 object-fit-cover" style="max-height: 500px;">
+                <img src="@Model.Model.BigImageUrl" alt="Araç Resmi" class="img-fluid rounded-start w-100 h-100 object-fit-cover" style="max-height: 500px;">
             </div>
 
             <div class="col-md-6">
                 <div class="card-body">
-                    <h3 class="card-title text-primary">@Model.Brand.Name @Model.Model</h3>
+                    <h3 class="card-title text-primary">@Model.Model.Brand.Name @Model.Model.ModelName</h3>
                     <p class="card-text"><strong>Stok No:</strong> @Model.StockNumber</p>
-                    <p class="card-text"><strong>Sınıf:</strong> @Model.CarClass.ClassName</p>
+                    <p class="card-text"><strong>Plaka:</strong> @Model.LicensePlate</p>
+                    <p class="card-text"><strong>Sınıf:</strong> @Model.Model.CarClass.ClassName</p>
                     <p class="card-text"><strong>Lokasyon:</strong> @Model.LocationName</p>
                     <p class="card-text"><strong>Model Yılı:</strong> @Model.Year</p>
                     
@@ -30,8 +31,8 @@
                         <strong>Yakıt Türü:</strong> @(((FuelEnum)Model.Fuel).ToString())
                     </p>
 
-                    <p class="card-text"><strong>Koltuk Sayısı:</strong> @Model.Seat Koltuk</p>
-                    <p class="card-text"><strong>Bagaj:</strong> @Model.Luggage Valiz</p>
+                    <p class="card-text"><strong>Koltuk Sayısı:</strong> @Model.Model.Seat Koltuk</p>
+                    <p class="card-text"><strong>Bagaj:</strong> @Model.Model.Luggage Valiz</p>
                     <p class="card-text">
                         <strong>Durum:</strong>
                         @{

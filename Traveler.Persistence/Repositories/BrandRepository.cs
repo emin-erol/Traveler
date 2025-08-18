@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Traveler.Application.Dtos.BrandDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
 using Traveler.Persistence.Context;
@@ -11,8 +13,10 @@ namespace Traveler.Persistence.Repositories
 {
     public class BrandRepository : GenericRepository<Brand>, IBrandDal
     {
+        private readonly TravelerDbContext _context;
         public BrandRepository(TravelerDbContext context) : base(context)
         {
+            _context = context;
         }
 
         public async Task CreateAsync(Brand entity)
@@ -38,6 +42,35 @@ namespace Traveler.Persistence.Repositories
         public async Task UpdateAsync(Brand entity)
         {
             await base.UpdateAsync(entity);
+        }
+
+        public async Task<BrandDto> GetBrandByModelId(int modelId)
+        {
+            var result = await _context.Models
+                .Where(m => m.ModelId == modelId)
+                .Select(m => new BrandDto
+                {
+                    BrandId = m.Brand.BrandId,
+                    Name = m.Brand.Name
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
+        }
+
+        public async Task<List<GetBrandsWithModelsDto>> GetBrandsWithModels()
+        {
+            var result = await _context.Brands
+                .Include(b => b.Models)
+                .Select(b => new GetBrandsWithModelsDto
+                {
+                    BrandId = b.BrandId,
+                    Name = b.Name,
+                    ModelNames = b.Models.Select(m => m.ModelName).ToList()
+                })
+                .ToListAsync();
+
+            return result;
         }
     }
 }

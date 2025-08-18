@@ -35,9 +35,31 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label asp-for="Model" class="col-sm-3 col-form-label text-end">Model</label>
+                                <label class="col-sm-3 col-form-label text-end">Marka</label>
                                 <div class="col-sm-9">
-                                    <input asp-for="Model" class="form-control" />
+                                    <select id="brandDropdown" class="form-select">
+                                        <option disabled selected value="">Marka Seçin</option>
+                                        @foreach (var brand in ViewBag.Brands as List<ResultBrandViewModel>)
+                                        {
+                                            <option value="@brand.BrandId">@brand.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="ModelId" class="col-sm-3 col-form-label text-end">Model</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="ModelId" id="modelDropdown" class="form-select">
+                                        <option disabled selected value="">Önce Marka Seçin</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="LicensePlate" class="col-sm-3 col-form-label text-end">Plaka</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="LicensePlate" class="form-control" />
                                 </div>
                             </div>
 
@@ -55,59 +77,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
-                                <label asp-for="Seat" class="col-sm-3 col-form-label text-end">Koltuk Sayısı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Seat" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="Luggage" class="col-sm-3 col-form-label text-end">Bagaj Kapasitesi</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Luggage" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="CoverImageUrl" class="col-sm-3 col-form-label text-end">Kapak Görsel URL</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="CoverImageUrl" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="BigImageUrl" class="col-sm-3 col-form-label text-end">Büyük Görsel URL</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="BigImageUrl" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="BrandId" class="col-sm-3 col-form-label text-end">Marka</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="BrandId" class="form-select">
-                                        <option disabled selected value="">Marka Seçin</option>
-                                        @foreach (var brand in ViewBag.Brands as List<ResultBrandViewModel>)
-                                        {
-                                            <option value="@brand.BrandId">@brand.Name</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="CarClassId" class="col-sm-3 col-form-label text-end">Araç Sınıfı</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="CarClassId" class="form-select">
-                                        <option disabled selected value="">Sınıf Seçin</option>
-                                        @foreach (var cls in ViewBag.CarClasses as List<ResultCarClassViewModel>)
-                                        {
-                                            <option value="@cls.CarClassId">@cls.ClassName</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+                            
 
                             <div class="row mb-3">
                                 <label asp-for="LocationId" class="col-sm-3 col-form-label text-end">Lokasyon</label>
@@ -227,6 +197,29 @@
 
 <script>
     $(document).ready(function () {
+        $("#brandDropdown").change(function () {
+            var brandId = $(this).val();
+
+            if (brandId) {
+                $.ajax({
+                    url: '/Admin/Car/GetModelsOfBrand',
+                    type: 'GET',
+                    data: { brandId: brandId },
+                    success: function (models) {
+
+                        console.log('Models:', models);
+                        var modelDropdown = $("#modelDropdown");
+                        modelDropdown.empty();
+                        modelDropdown.append('<option disabled selected value="">Model Seçin</option>');
+
+                            $.each(models, function (i, model) {
+                                modelDropdown.append('<option value="' + model.ModelId + '">' + model.ModelName + '</option>');
+                            });
+                    }
+                });
+            }
+        });
+
         $("#createCarForm").on("submit", function (e) {
             e.preventDefault();
 

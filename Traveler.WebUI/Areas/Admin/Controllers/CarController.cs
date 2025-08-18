@@ -10,6 +10,7 @@ using Traveler.ViewModel.CarPricingViewModels;
 using Traveler.ViewModel.CarViewModels;
 using Traveler.ViewModel.FeatureViewModels;
 using Traveler.ViewModel.LocationViewModels;
+using Traveler.ViewModel.ModelViewModels;
 using Traveler.ViewModel.PricingViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
@@ -213,6 +214,10 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 var carPricingsValues = JsonConvert.DeserializeObject<List<ResultCarPricingViewModel>>(carPricingsJson);
                 var locationsValues = JsonConvert.DeserializeObject<List<ResultLocationViewModel>>(locationsJson);
 
+                var selectedBrandResponse = await client.GetAsync("https://localhost:7252/api/Brands/GetBrandByModelId/" + carValue.ModelId);
+                var selectedBrandJson = await selectedBrandResponse.Content.ReadAsStringAsync();
+                var selectedBrandValue = JsonConvert.DeserializeObject<ResultBrandViewModel>(selectedBrandJson);
+
                 ViewBag.Brands = brandValues;
                 ViewBag.CarClasses = carClassValues;
                 ViewBag.Features = featuresValues;
@@ -220,6 +225,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
                 ViewBag.CarFeatures = carFeaturesValues;
                 ViewBag.CarPricings = carPricingsValues;
                 ViewBag.Locations = locationsValues;
+                ViewBag.SelectedBrand = selectedBrandValue;
 
                 return View(carValue);
             }
@@ -295,6 +301,23 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
             }
 
             return View("CreateCarModal", dto);
+        }
+
+        [HttpGet("GetModelsOfBrand")]
+        public async Task<IActionResult> GetModelsOfBrand(int brandId)
+        {
+            var client = _httpClientFactory.CreateClient();
+
+            var response = await client.GetAsync("https://localhost:7252/api/Models/GetModelsByBrand/" + brandId);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var models = JsonConvert.DeserializeObject<List<GetModelsByBrandViewModel>>(json);
+                return Json(models);
+            }
+
+            return StatusCode((int)response.StatusCode, "API hatası");
         }
     }
 }

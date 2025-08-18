@@ -40,6 +40,8 @@
 
     var carPricings = ViewBag.CarPricings as List<ResultCarPricingViewModel>;
     var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
+    var selectedBrand = ViewBag.SelectedBrand as ResultBrandViewModel;
+    int selectedBrandId = selectedBrand.BrandId;
 }
 
 @functions {
@@ -72,9 +74,26 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label asp-for="Model" class="col-sm-3 col-form-label text-end">Model</label>
+                                <label class="col-sm-3 col-form-label text-end">Marka</label>
                                 <div class="col-sm-9">
-                                    <input asp-for="Model" class="form-control" />
+                                    <select id="brandDropdown" class="form-select">
+                                        <option disabled value="">Marka Seçin</option>
+                                        @foreach (var brand in ViewBag.Brands as List<ResultBrandViewModel>)
+                                        {
+                                            <option value="@brand.BrandId" selected="@(brand.BrandId == selectedBrandId)">
+                                                @brand.Name
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="ModelId" class="col-sm-3 col-form-label text-end">Model</label>
+                                <div class="col-sm-9">
+                                    <select asp-for="ModelId" id="modelDropdown" class="form-select">
+                                        <option disabled selected value="">Önce Marka Seçin</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -89,52 +108,6 @@
                                 <label asp-for="Mileage" class="col-sm-3 col-form-label text-end">Kilometre</label>
                                 <div class="col-sm-9">
                                     <input asp-for="Mileage" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="Seat" class="col-sm-3 col-form-label text-end">Koltuk Sayısı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Seat" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="Luggage" class="col-sm-3 col-form-label text-end">Bagaj Kapasitesi</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Luggage" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="CoverImageUrl" class="col-sm-3 col-form-label text-end">Kapak Görsel URL</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="CoverImageUrl" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="BigImageUrl" class="col-sm-3 col-form-label text-end">Büyük Görsel URL</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="BigImageUrl" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="BrandId" class="col-sm-3 col-form-label text-end">Marka</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="BrandId" asp-items="brandList" class="form-select">
-                                        <option disabled value="">Marka Seçin</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="CarClassId" class="col-sm-3 col-form-label text-end">Araç Sınıfı</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="CarClassId" asp-items="carClassList" class="form-select">
-                                        <option disabled value="">Sınıf Seçin</option>
-                                    </select>
                                 </div>
                             </div>
 
@@ -250,11 +223,52 @@
 <script>
     $(document).ready(function () {
         const originalValues = {};
+        const selectedBrandId = "@selectedBrandId";
+        const selectedModelId = "@Model.ModelId";
+
+        if (selectedBrandId) {
+            $.ajax({
+                url: '/Admin/Car/GetModelsOfBrand',
+                type: 'GET',
+                data: { brandId: selectedBrandId },
+                success: function (models) {
+                    var modelDropdown = $("#modelDropdown");
+                    modelDropdown.empty();
+                    modelDropdown.append('<option disabled value="">Model Seçin</option>');
+
+                    $.each(models, function (i, model) {
+                        var selected = model.ModelId == selectedModelId ? "selected" : "";
+                        modelDropdown.append('<option value="' + model.ModelId + '" ' + selected + '>' + model.ModelName + '</option>');
+                    });
+                }
+            });
+        }
 
         $(".pricing-input").each(function () {
             const carPricingId = $(this).data("id");
             const amount = parseFloat($(this).val()) || 0;
             originalValues[carPricingId] = amount;
+        });
+
+        $("#brandDropdown").change(function () {
+            var brandId = $(this).val();
+
+            if (brandId) {
+                $.ajax({
+                    url: '/Car/GetModelsOfBrand',
+                    type: 'GET',
+                    data: { brandId: brandId },
+                    success: function (models) {
+                        var modelDropdown = $("#modelDropdown");
+                        modelDropdown.empty();
+                        modelDropdown.append('<option disabled selected value="">Model Seçin</option>');
+
+                        $.each(models, function (i, model) {
+                            modelDropdown.append('<option value="' + model.modelId + '">' + model.modelName + '</option>');
+                        });
+                    }
+                });
+            }
         });
 
         $("form").on("submit", function (e) {

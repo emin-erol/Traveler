@@ -31,6 +31,22 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
+        [HttpGet("GetModelsByBrand/{brandId}")]
+        public async Task<IActionResult> GetModelsByBrand(int brandId)
+        {
+            var values = await _modelDal.GetModelsByBrand(brandId);
+
+            return Ok(values);
+        }
+
+        [HttpGet("GetBrandNameByModelName/{modelName}")]
+        public async Task<IActionResult> GetBrandNameByModelName(string modelName)
+        {
+            var value = await _modelDal.GetBrandNameByModelName(modelName);
+
+            return Ok(value);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateModel(CreateModelDto model)
         {

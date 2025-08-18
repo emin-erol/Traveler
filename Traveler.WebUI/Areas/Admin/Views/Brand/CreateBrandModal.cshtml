@@ -1,0 +1,35 @@
+﻿@model CreateBrandViewModel
+
+@{
+    ViewData["Title"] = "CreateBrandModal";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+}
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Yeni Marka Oluştur</h4>
+                        <p class="card-subtitle mb-4">
+                            Eklemek istediğiniz yeni markayı lütfen doğru giriniz ve kaydet butonuna basınız.
+                        </p>
+                        <form method="post" asp-action="CreateBrand" asp-controller="Brand">
+
+                            <div class="row mb-3">
+                                <label asp-for="Name" class="col-sm-3 col-form-label text-end">Marka Adı</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Name" class="form-control" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Markayı Kaydet</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

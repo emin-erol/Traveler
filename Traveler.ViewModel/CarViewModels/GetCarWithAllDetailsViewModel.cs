@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Traveler.ViewModel.BrandViewModels;
 using Traveler.ViewModel.CarClassViewModels;
 using Traveler.ViewModel.CarPricingViewModels;
+using Traveler.ViewModel.ModelViewModels;
 using Traveler.ViewModel.PricingViewModels;
 
 namespace Traveler.ViewModel.CarViewModels
@@ -14,19 +15,14 @@ namespace Traveler.ViewModel.CarViewModels
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
-        public string Model { get; set; }
         public int Year { get; set; }
-        public string CoverImageUrl { get; set; }
         public int Mileage { get; set; }
         public int Transmission { get; set; }
-        public byte Seat { get; set; }
-        public byte Luggage { get; set; }
         public int Fuel { get; set; }
-        public string BigImageUrl { get; set; }
         public string Description { get; set; }
         public int Status { get; set; }
-        public ResultBrandViewModel Brand { get; set; }
-        public ResultCarClassViewModel CarClass { get; set; }
+        public string LicensePlate { get; set; }
+        public ResultModelViewModel Model { get; set; }
         public List<string> FeatureNames { get; set; }
         public string LocationName { get; set; }
         public DateTime CreatedTime { get; set; }
