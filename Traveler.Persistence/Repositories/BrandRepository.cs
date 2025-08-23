@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Traveler.Application.Dtos.BrandDtos;
+using Traveler.Application.Dtos.CarClassDtos;
+using Traveler.Application.Dtos.ModelDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
 using Traveler.Persistence.Context;
@@ -62,11 +64,30 @@ namespace Traveler.Persistence.Repositories
         {
             var result = await _context.Brands
                 .Include(b => b.Models)
+                    .ThenInclude(m => m.CarClass)
                 .Select(b => new GetBrandsWithModelsDto
                 {
-                    BrandId = b.BrandId,
-                    Name = b.Name,
-                    ModelNames = b.Models.Select(m => m.ModelName).ToList()
+                    Brand = new BrandDto
+                    {
+                        BrandId = b.BrandId,
+                        Name = b.Name
+                    },
+                    Models = b.Models.Select(m => new ModelDto
+                    {
+                        ModelId = m.ModelId,
+                        ModelName = m.ModelName,
+                        ModelDescription = m.ModelDescription,
+                        CoverImageUrl = m.CoverImageUrl,
+                        Seat = m.Seat,
+                        Luggage = m.Luggage,
+                        BigImageUrl = m.BigImageUrl,
+                        Brand = null!,
+                        CarClass = new CarClassDto
+                        {
+                            CarClassId = m.CarClass.CarClassId,
+                            ClassName = m.CarClass.ClassName
+                        }
+                    }).ToList()
                 })
                 .ToListAsync();
 

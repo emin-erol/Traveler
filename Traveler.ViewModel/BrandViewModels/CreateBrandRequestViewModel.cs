@@ -7,9 +7,9 @@ using Traveler.ViewModel.ModelViewModels;
 
 namespace Traveler.ViewModel.BrandViewModels
 {
-    public class GetBrandsWithModelsViewModel
+    public class CreateBrandRequestViewModel
     {
-        public ResultBrandViewModel Brand { get; set; }
-        public List<ResultModelViewModel> Models { get; set; }
+        public CreateBrandViewModel BrandDto { get; set; }
+        public List<CreateModelViewModel> ModelDtos { get; set; }
     }
 }

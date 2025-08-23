@@ -9,8 +9,7 @@ namespace Traveler.Application.Dtos.BrandDtos
 {
     public class GetBrandsWithModelsDto
     {
-        public int BrandId { get; set; }
-        public string Name { get; set; }
-        public List<string> ModelNames { get; set; }
+        public BrandDto Brand { get; set; }
+        public List<ModelDto> Models { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Traveler.ViewModel.BrandViewModels;
+using Traveler.ViewModel.CarClassViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
 {
@@ -23,12 +24,18 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         {
             var client = _httpClientFactory.CreateClient();
 
-            var response = await client.GetAsync("https://localhost:7252/api/Brands");
+            var response = await client.GetAsync("https://localhost:7252/api/Brands/GetBrandsWithModels");
+            var carClassResponse = await client.GetAsync("https://localhost:7252/api/CarClasses");
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode && carClassResponse.IsSuccessStatusCode)
             {
                 var jsonData = await response.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<List<ResultBrandViewModel>>(jsonData);
+                var carClassJson = await carClassResponse.Content.ReadAsStringAsync();
+
+                var values = JsonConvert.DeserializeObject<List<GetBrandsWithModelsViewModel>>(jsonData);
+                var carClassValues = JsonConvert.DeserializeObject<List<ResultCarClassViewModel>>(carClassJson);
+
+                ViewBag.CarClasses = carClassValues;
 
                 return View(values);
             }
