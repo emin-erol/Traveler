@@ -21,5 +21,8 @@ namespace Traveler.Domain.Entities
         public List<Car> Cars { get; set; }
         public Brand Brand { get; set; }
         public CarClass CarClass { get; set; }
+
+        public List<ModelFeature> ModelFeatures { get; set; }
+        public List<ModelPricing> ModelPricings { get; set; }
     }
 }

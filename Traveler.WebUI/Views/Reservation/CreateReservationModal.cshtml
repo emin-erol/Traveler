@@ -1,178 +1,178 @@
-﻿@using Newtonsoft.Json
-@using Traveler.ViewModel.Enums
-@model CreateReservationViewModel
-
-@{
+﻿@{
     ViewData["Title"] = "CreateReservationModal";
     Layout = "~/Views/UILayout/Index.cshtml";
 
-    var locations = ViewBag.Locations as List<GetLocationWithCityAndAvailabilityViewModel>
-                    ?? new List<GetLocationWithCityAndAvailabilityViewModel>();
-
+    var locations = ViewBag.Locations as List<GetLocationWithCityViewModel>;
     var mileagePackages = ViewBag.MileagePackages as List<ResultMileagePackageViewModel>;
-
     var securityPackages = ViewBag.SecurityPackages as List<GetSecurityPackagesWithPackageOptionsViewModel>;
-
-    var cityEnumList = Enum.GetValues(typeof(CityEnum))
-        .Cast<CityEnum>()
-        .Select(e => new { Id = (int)e, Name = e.ToString() })
-        .ToList();
+    var features = ViewBag.Features as List<ResultFeatureViewModel>;
+    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
 }
 
 <style>
-    .car-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        border-radius: 10px;
+    input,
+    select,
+    textarea {
+        cursor: pointer !important;
+    }
+
+    .model-card {
+        position: relative;
+        border: 2px solid #ddd;
+        border-radius: 12px;
+        padding: 0; /* resim üstte tam otursun diye padding kaldırıldı */
+        cursor: pointer;
+        transition: transform .2s ease, border-color .2s;
+        background: white;
+        height: 360px; /* kartı büyütüyoruz */
         overflow: hidden;
     }
 
-        .car-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            z-index: 5;
+    .model-hover {
+        transform: scale(1.04);
+        border-color: #0d6efd;
+    }
+
+    .selected-model {
+        border-color: #28a745 !important;
+        box-shadow: 0 0 20px rgba(40,167,69,.4);
+    }
+
+    /* --- RESİM ALANI --- */
+    .model-image-container {
+        width: 100%;
+        height: 180px; /* yükseklik artırıldı */
+        overflow: hidden;
+    }
+
+        .model-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* resmi kenarlara tam doldurur */
+            object-position: center;
         }
 
-        .car-card img {
-            height: 200px;
-            object-fit: cover;
-        }
+    /* --- MODEL BİLGİ ALANI --- */
+    .model-info {
+        padding: 6px 5px;
+    }
 
-        .car-card.border-primary {
-            border: 3px solid #007bff;
-        }
+    /* --- FİYAT ALANI --- */
+    .price-area {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #28a745; /* yeşil */
+    }
+
+    /* --- DETAY BUTONU --- */
+    .details-area {
+        position: absolute;
+        bottom: 12px;
+        left: 12px;
+    }
 
     .mileage-card {
-        transition: all 0.2s ease-in-out;
+        position: relative;
+        border: 2px solid #ddd;
+        border-radius: 16px;
+        padding: 24px; /* ⬅️ İç boşluk arttı */
+        cursor: pointer;
+        transition: transform .2s ease, border-color .2s, box-shadow .2s;
+        background: white;
+        min-height: 220px; /* ⬅️ Kartlar belirgin şekilde büyür */
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
 
         .mileage-card:hover {
-            transform: translateY(-3px);
+            transform: scale(1.04); /* ⬅️ 1.05 yerine daha yumuşak */
+            box-shadow: 0 10px 25px rgba(0,0,0,.12);
         }
 
-        .mileage-card.border-primary {
-            border-width: 2px !important;
-        }
-
-    .package-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        border: 2px solid transparent;
-    }
-
-        .package-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-
-        .package-card.selected {
-            border-color: #0d6efd;
-            box-shadow: 0 0 10px rgba(13,110,253,0.5);
-        }
-
-    .package-price {
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
-
-    .package-limit {
-        font-weight: 600;
-    }
-
-    .option-list li {
+    .security-card {
         position: relative;
-        padding-left: 25px;
-        margin-bottom: 5px;
+        border: 2px solid #ddd;
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: transform .2s ease, border-color .2s;
+        background: white;
+        height: 100%;
     }
 
-        .option-list li::before {
-            content: "✔";
-            color: #28a745;
-            position: absolute;
-            left: 0;
-            font-weight: bold;
+        .security-card:hover {
+            transform: scale(1.05);
         }
+
+    .selected-security {
+        border-color: #28a745 !important;
+        box-shadow: 0 0 10px rgba(40,167,69,.4);
+    }
 </style>
 
-<section class="ftco-section contact-section">
+<div class="container my-4">
+    <h1 class="mb-4 text-center fw-bold">Rezervasyon Oluştur</h1>
 
-    <div id="step1" class="container">
-        <div class="row d-flex mb-5 contact-info">
-            <div class="col-md-12 block-9 mb-md-5">
-                <h3 class="alert alert-success">Araç Rezervasyon Formu - 1. Adım</h3>
+    <!-- Adım 1 -->
+    <div id="step-1" class="reservation-step">
 
-                <form id="reservationForm" method="post" asp-action="CreateReservation" asp-controller="Reservation" class="bg-light p-4">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h4 class="mb-0 fw-semibold">1. Adım: Lokasyon ve Tarih/Saat Bilgileri</h4>
+            </div>
 
-                    <div class="row">
+            <div class="card-body p-4">
+                <form id="form-step-1">
+
+                    <div class="row mb-3">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="pickupLocation">Alış Lokasyonu</label>
-                                <select id="pickupLocation" name="PickUpLocationId" class="form-control" required>
-                                    <option value="" disabled selected>— Bir lokasyon seçin —</option>
-                                    @foreach (var loc in locations)
-                                    {
-                                        <option value="@loc.LocationId">
-                                            @loc.LocationName, @(((CityEnum)loc.City.CityName).ToString())
-                                        </option>
-                                    }
-                                </select>
-                                <div id="pickupDetails" class="mt-2 small text-muted" style="display:none;"></div>
-                            </div>
+                            <label for="pickupLocation" class="form-label fw-semibold">Alış Lokasyonu</label>
+                            <select id="pickupLocation" class="form-select rounded-2 px-3 py-2" style="height: 46px;">
+                                <option value="">Seçiniz</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="dropoffLocation">Teslim Lokasyonu</label>
-                                <select id="dropoffLocation" name="DropOffLocationId" class="form-control" required>
-                                    <option value="" disabled selected>— Bir lokasyon seçin —</option>
-                                    @foreach (var loc in locations)
-                                    {
-                                        <option value="@loc.LocationId">
-                                            @loc.LocationName, @(((CityEnum)loc.City.CityName).ToString())
-                                        </option>
-                                    }
-                                </select>
-                                <div id="dropoffDetails" class="mt-2 small text-muted" style="display:none;"></div>
-                            </div>
+                            <label for="dropoffLocation" class="form-label fw-semibold">Teslim Lokasyonu</label>
+                            <select id="dropoffLocation" class="form-select rounded-2 px-3 py-2" style="height: 46px;">
+                                <option value="">Seçiniz</option>
+                            </select>
                         </div>
                     </div>
 
-                    <hr />
+                    <div class="row mb-3">
 
-                    <div class="row">
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="pickupDate">Alış Tarihi</label>
-                                <input type="date" id="pickupDate" name="PickUpDate" class="form-control" required />
-                                <div id="pickupDateError" class="small text-danger mt-1" style="display:none;"></div>
-                            </div>
+                            <label for="pickupDate" class="form-label fw-semibold">Alış Tarihi</label>
+                            <input type="date" id="pickupDate" class="form-control p-3 rounded-3">
                         </div>
 
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="pickupTime">Alış Saati</label>
-                                <input type="time" id="pickupTime" name="PickUpTime" class="form-control" required />
-                                <div id="pickupTimeError" class="small text-danger mt-1" style="display:none;"></div>
-                            </div>
+                            <label for="pickupTime" class="form-label fw-semibold">Alış Saati</label>
+                            <input type="time" id="pickupTime" class="form-control p-3 rounded-3">
                         </div>
 
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="dropoffDate">Teslim Tarihi</label>
-                                <input type="date" id="dropoffDate" name="DropOffDate" class="form-control" required />
-                                <div id="dropoffDateError" class="small text-danger mt-1" style="display:none;"></div>
-                            </div>
+                            <label for="dropoffDate" class="form-label fw-semibold">Teslim Tarihi</label>
+                            <input type="date" id="dropoffDate" class="form-control p-3 rounded-3">
                         </div>
 
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="dropoffTime">Teslim Saati</label>
-                                <input type="time" id="dropoffTime" name="DropOffTime" class="form-control" required />
-                                <div id="dropoffTimeError" class="small text-danger mt-1" style="display:none;"></div>
-                            </div>
+                            <label for="dropoffTime" class="form-label fw-semibold">Teslim Saati</label>
+                            <input type="time" id="dropoffTime" class="form-control p-3 rounded-3">
                         </div>
+
                     </div>
 
-                    <div class="mt-3">
-                        <button type="button" id="nextStep" class="btn btn-primary">İleri</button>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-primary btn-lg px-4" id="nextStep1">
+                            Sonraki Adım
+                        </button>
                     </div>
 
                 </form>
@@ -180,773 +180,908 @@
         </div>
     </div>
 
-    <div id="step2" class="container" style="display:none;">
-        <div class="row d-flex mb-5 contact-info">
-            <div class="col-md-12 block-9 mb-md-5">
-                <h3 class="alert alert-info">Araç Seçimi - 2. Adım</h3>
+    <!-- Adım 2 -->
+    <div id="step-2" class="reservation-step d-none">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h4 class="mb-0 fw-semibold">2. Adım: Araç Modeli Seçimi</h4>
+            </div>
 
-                <div id="carsList" class="row"></div>
-
-                <div class="mt-3">
-                    <button type="button" id="backToStep1" class="btn btn-secondary">Geri</button>
-                    <button type="button" id="nextStep2" class="btn btn-primary" disabled>İleri</button>
+            <div class="card-body p-4">
+                <div id="modelsContainer" class="row gy-3">
+                    <!-- Dinamik olarak dolacak -->
                 </div>
-                <input type="hidden" id="selectedCarId" name="SelectedCarId" />
-                <input type="hidden" id="selectedCarPrice" />
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary px-4" id="prevStep2">Önceki Adım</button>
+                    <button type="button" class="btn btn-primary px-4" id="nextStep2">Sonraki Adım</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adım 3 -->
+    <div id="step-3" class="reservation-step d-none">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h4 class="mb-0 fw-semibold">3. Adım: Kilometre Paketi Seçimi</h4>
+            </div>
+
+            <div class="card-body p-4">
+                <div id="mileageContainer" class="row gy-3">
+                    <!-- Dinamik içerik -->
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary px-4" id="prevStep3">Önceki Adım</button>
+                    <button type="button" class="btn btn-primary px-4" id="nextStep3">Sonraki Adım</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="step3" class="container mt-4" style="display:none;">
-        <h3 class="alert alert-info">Kilometre Seçimi - 3. Adım</h3>
-        <div class="row" id="mileagePackageContainer">
-            <div class="col-md-4 mb-3">
-                <div class="card mileage-card h-100"
-                     data-id="0"
-                     data-limit="0"
-                     data-amount="0"
-                     style="cursor:pointer;">
-                    <div class="card-body">
-                        <h5 class="card-title text-center">Paket Seçmek İstemiyorum</h5>
-                        <div class="d-flex justify-content-between">
-                            <span><strong>Limit:</strong> 0 km</span>
-                            <span><strong>Fiyat:</strong> 20 TL/Km</span>
-                        </div>
-                        <p class="mt-2">
-                            Kilometre paketi seçmek istemiyorsanız bu kutucuğu seçerek kilometre başına ücretlendirilirsiniz.
-                        </p>
-                    </div>
-                </div>
+    <!-- Adım 4 -->
+    <div id="step-4" class="reservation-step d-none">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h4 class="mb-0 fw-semibold">4. Adım: Güvenlik Paketi Seçimi</h4>
             </div>
 
-            @if (ViewBag.MileagePackages != null)
-            {
-                foreach (var pkg in ViewBag.MileagePackages)
-                {
-                    <div class="col-md-4 mb-3">
-                        <div class="card mileage-card h-100"
-                             data-id="@pkg.MileagePackageId"
-                             data-limit="@pkg.PackageLimit"
-                             data-amount="@pkg.Amount"
-                             style="cursor:pointer;">
-                            <div class="card-body">
-                                <h5 class="card-title text-center">@pkg.PackageName</h5>
-                                <div class="d-flex justify-content-between">
-                                    <span><strong>Limit:</strong> @(pkg.PackageLimit == int.MaxValue ? "Sınırsız" : pkg.PackageLimit + " km")</span>
-                                    <span><strong>Fiyat:</strong> @pkg.Amount.ToString("N2") TL</span>
-                                </div>
-                                <p class="mt-2">@pkg.Description</p>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-        </div>
-        <input type="hidden" id="selectedMileagePackageId" name="SelectedMileagePackageId" />
-        <div class="mt-3">
-            <button type="button" id="backToStep2" class="btn btn-secondary">Geri</button>
-            <button type="button" id="nextStep3" class="btn btn-primary" disabled>İleri</button>
-        </div>
-        <input type="hidden" id="selectedMileagePackageId" name="SelectedMileagePackageId" />
-    </div>
+            <div class="card-body p-4">
+                <div id="securityContainer" class="row gy-3">
+                    <!-- Dinamik içerik -->
+                </div>
 
-    <div id="step4" class="container mt-4" style="display:none;">
-        <h3 class="alert alert-info">Güvenlik Paketi Seçimi - 4. Adım</h3>
-        <div class="row" id="securityPackageContainer">
-
-            @if (securityPackages != null)
-            {
-                foreach (var pkg in securityPackages)
-                {
-                    <div class="col-md-4 mb-3">
-                        <div class="card security-card h-100"
-                             data-id="@pkg.SecurityPackageId"
-                             data-amount="@pkg.Amount"
-                             style="cursor:pointer;">
-                            <div class="card-body">
-                                <h5 class="card-title text-center">@pkg.PackageName</h5>
-                                @if (pkg.SecurityPackageOptions != null && pkg.SecurityPackageOptions.Any())
-                                {
-                                    <ul class="list-unstyled">
-                                        @foreach (var option in pkg.SecurityPackageOptions)
-                                        {
-                                            <li>✔ @option</li>
-                                        }
-                                    </ul>
-                                }
-                                <div class="text-center mb-3">
-                                    <strong>Fiyat:</strong> @pkg.Amount.ToString("N2") TL
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-        </div>
-        <input type="hidden" id="selectedSecurityPackageId" name="SelectedSecurityPackageId" />
-
-        <div class="mt-3">
-            <button type="button" id="backToStep3" class="btn btn-secondary">Geri</button>
-            <button type="submit" id="finishReservation" class="btn btn-success" disabled>Rezervasyonu Tamamla</button>
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary px-4" id="prevStep4">Önceki Adım</button>
+                    <button type="button" class="btn btn-success px-4" id="showSummary">Rezervasyon Özetini Gör</button>
+                </div>
+            </div>
         </div>
     </div>
 
-</section>
+    <!-- Rezervasyon Özeti -->
+    <div id="step-5" class="reservation-step d-none">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-success text-white py-3 rounded-top-4">
+                <h4 class="mb-0 fw-semibold">Rezervasyon Özeti</h4>
+            </div>
 
-<div class="modal fade" id="carDetailModal" tabindex="-1" aria-labelledby="carDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
+            <div class="card-body p-4">
+
+                <!-- Lokasyon & Tarih -->
+                <div class="mb-4">
+                    <h6 class="fw-bold">Rezervasyon Bilgileri</h6>
+                    <p class="mb-1">
+                        <strong>Alış:</strong> <span id="summaryPickupLocation"></span>
+                    </p>
+                    <p class="mb-1">
+                        <strong>Teslim:</strong> <span id="summaryDropoffLocation"></span>
+                    </p>
+                    <p class="mb-0">
+                        <strong>Tarih:</strong>
+                        <span id="summaryDateTime"></span>
+                    </p>
+                </div>
+
+                <hr />
+
+                <!-- Seçilenler -->
+                <div class="row gy-4">
+
+                    <div class="col-md-4">
+                        <h6 class="fw-bold mb-2">Araç</h6>
+                        <div id="summaryModel"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h6 class="fw-bold mb-2">Kilometre Paketi</h6>
+                        <div id="summaryMileage"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h6 class="fw-bold mb-2">Güvenlik Paketi</h6>
+                        <div id="summarySecurity"></div>
+                    </div>
+
+                </div>
+
+                <hr />
+
+                <!-- Fiyatlar -->
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between">
+                        <span>Araç Fiyatı</span>
+                        <strong id="summaryModelPrice"></strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Kilometre Paketi</span>
+                        <strong id="summaryMileagePrice"></strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Güvenlik Paketi</span>
+                        <strong id="summarySecurityPrice"></strong>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between fs-5">
+                        <strong>Toplam Fiyat</strong>
+                        <strong class="text-success" id="summaryTotalPrice"></strong>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary px-4" id="prevStep5">
+                        Önceki Adım
+                    </button>
+                    <button type="button" class="btn btn-success px-4" id="confirmReservation">
+                        Rezervasyonu Onayla
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="modelDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4">
+
             <div class="modal-header">
-                <h5 class="modal-title" id="carDetailModalLabel">Araç Detayı</h5>
-                <button type="button" class="btn-close close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Kapat">
+                <h5 class="modal-title" id="modelDetailTitle">Model Detayı</h5>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
             <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="card shadow-lg border-0">
-                        <div class="row g-0">
-                            <div class="col-md-6">
-                                <img id="detailImage" src="" alt="Araç Resmi" class="img-fluid rounded-start w-100 h-100 object-fit-cover" style="max-height: 500px;">
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h3 class="card-title text-primary" id="detailTitle"></h3>
-                                    <p><strong>Sınıf:</strong> <span id="detailClass"></span></p>
-                                    <p><strong>Lokasyon:</strong> <span id="detailLocation"></span></p>
-                                    <p><strong>Model Yılı:</strong> <span id="detailYear"></span></p>
-                                    <p><strong>Vites:</strong> <span id="detailTransmission"></span></p>
-                                    <p><strong>Yakıt Türü:</strong> <span id="detailFuel"></span></p>
-                                    <p><strong>Koltuk Sayısı:</strong> <span id="detailSeat"></span></p>
-                                    <p><strong>Bagaj:</strong> <span id="detailLuggage"></span></p>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="card-footer" id="detailFeaturesWrapper" style="display:none;">
-                            <h5>Araç Özellikleri</h5>
-                            <div class="row" id="detailFeatures"></div>
-                        </div>
+                <img id="modelDetailImage"
+                     class="img-fluid rounded mb-3 w-100"
+                     style="max-height:300px; object-fit:cover;" />
 
-                        <div class="card-footer mt-4">
-                            <h5>Araç Açıklaması</h5>
-                            <p id="detailDescription"></p>
-                        </div>
-                    </div>
+                <p id="modelDetailDescription" class="text-muted"></p>
+
+                <div class="d-flex gap-4 mb-3">
+                    <span class="mr-2"><i class="bi bi-person-fill"></i> <strong id="detailSeat"></strong></span>
+                    <span><i class="bi bi-luggage-fill"></i> <strong id="detailLuggage"></strong></span>
+                    <span class="ml-3"><strong>Sınıf:</strong> <span id="detailClass"></span></span>
                 </div>
+
+                <hr />
+
+                <h6 class="fw-bold mb-2">Araç Özellikleri</h6>
+                <div id="modelFeaturesContainer" class="row"></div>
+
             </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    $(function () {
-        var locations = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(locations));
-        var cityEnum = @Html.Raw(JsonConvert.SerializeObject(cityEnumList));
+    $(document).ready(function () {
 
-        const dayNames = { 1: "Pazartesi", 2: "Salı", 3: "Çarşamba", 4: "Perşembe", 5: "Cuma", 6: "Cumartesi", 7: "Pazar" };
+        let selectedMileagePackageId = null;
+        let selectedSecurityPackageId = null;
 
-        function dayOrCityName(cityId) {
-            var city = cityEnum.find(c => c.Id === cityId);
-            return city ? city.Name : "-";
+        function populateLocations() {
+            // locations (Razor tarafında zaten atadığın 'locations' değişkenini JS'e serialize ediyoruz)
+            const locations = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(locations));
+
+            // Traveler.ViewModel.Enums.CityEnum enumunu JS'e aktar
+            var cityEnum = @Html.Raw(
+                                Newtonsoft.Json.JsonConvert.SerializeObject(
+                                        Enum.GetValues(typeof(Traveler.ViewModel.Enums.CityEnum))
+                                                .Cast<Traveler.ViewModel.Enums.CityEnum>()
+                                                .ToDictionary(e => (int)e, e => e.ToString())
+                                )
+                        );
+
+            const $pickup = $("#pickupLocation");
+            const $dropoff = $("#dropoffLocation");
+
+            // Başlangıç seçeneği: seçilemez ve seçili
+            const defaultOption = `<option value="" selected disabled>Lokasyon Seçiniz</option>`;
+            $pickup.html(defaultOption);
+            $dropoff.html(defaultOption);
+
+            // Lokasyonları ekleme
+            $.each(locations, function (i, loc) {
+                const cityKey = loc.City && (loc.City.CityName || loc.City.cityName || loc.City.CityId) ? (loc.City.CityName || loc.City.cityName) : null;
+                const cityText = cityKey && cityEnum[cityKey] ? cityEnum[cityKey] : "Bilinmeyen Şehir";
+                const optionText = `${cityText} - ${loc.LocationName}`;
+                const optionHtml = `<option value="${loc.LocationId}">${optionText}</option>`;
+
+                $pickup.append(optionHtml);
+                $dropoff.append(optionHtml);
+            });
         }
 
-        function formatTimeRange(start, end) {
-            if (!start || !end) return "Belirtilmemiş";
-            return (start.length >= 5 ? start.substring(0,5) : start) + " - " + (end.length >= 5 ? end.substring(0,5) : end);
-        }
+        function validateStep1() {
 
-        function availableDaysText(loc) {
-            if (!loc || !loc.LocationAvailabilities) return "Bilgi yok";
-            var days = loc.LocationAvailabilities
-                .filter(x => x.IsAvailable)
-                .map(x => dayNames[x.DayOfWeek])
-                .filter(Boolean);
-            return days.length ? days.join(", ") : "Herhangi bir gün açık değil";
-        }
+            const pickupId = $("#pickupLocation").val();
+            const dropoffId = $("#dropoffLocation").val();
+            const pickupDate = $("#pickupDate").val();
+            const dropoffDate = $("#dropoffDate").val();
+            const pickupTime = $("#pickupTime").val();
+            const dropoffTime = $("#dropoffTime").val();
 
-        function isLocationAvailableOnDate(loc, dateObj) {
-            if (!loc) return false;
-            var jsDay = dateObj.getDay();
-            var modelDay = (jsDay === 0) ? 7 : jsDay;
-            var entry = loc.LocationAvailabilities && loc.LocationAvailabilities.find(x => x.DayOfWeek === modelDay);
-            return entry ? !!entry.IsAvailable : false;
-        }
-
-        function parseTimeToMinutes(hhmm) {
-            if (!hhmm) return null;
-            var parts = hhmm.split(":");
-            if (parts.length < 2) return null;
-            return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
-        }
-
-        function timeWithinRange(timeStr, startStr, endStr) {
-            var t = parseTimeToMinutes(timeStr);
-            var s = parseTimeToMinutes((startStr || "").substring(0,5));
-            var e = parseTimeToMinutes((endStr || "").substring(0,5));
-            if (t === null || s === null || e === null) return false;
-            return t >= s && t <= e;
-        }
-
-        function formatLocationDetailsHtml(loc) {
-            if (!loc) return "";
-            var start = loc.StartTime ? loc.StartTime.substring(0,5) : "";
-            var end = loc.EndTime ? loc.EndTime.substring(0,5) : "";
-            var days = availableDaysText(loc);
-            var desc = loc.Description ? `<div class="small text-muted mb-1">${loc.Description}</div>` : "";
-            return `
-                ${desc}
-                <div class="p-2 border rounded bg-light">
-                    <div><strong>Çalışma Saatleri:</strong> ${start ? start : "-"} - ${end ? end : "-"}</div>
-                    <div><strong>Aktif Günler:</strong> ${days}</div>
-                    <div><strong>Şehir:</strong> ${loc.City ? ( (typeof loc.City.CityName === "number") ? dayOrCityName(loc.City.CityName) : loc.City.CityName) : "-"}</div>
-                </div>
-            `;
-        }
-
-        function getNextAvailableDate(loc, fromDate) {
-            if (!loc) return null;
-            var start = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
-            for (var i = 0; i < 365; i++) {
-                var d = new Date(start);
-                d.setDate(start.getDate() + i);
-                if (isLocationAvailableOnDate(loc, d)) {
-                    return d;
-                }
+            // 1. Alanlar boş mu kontrol
+            if (!pickupId || !dropoffId || !pickupDate || !dropoffDate || !pickupTime || !dropoffTime) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Eksik Bilgi',
+                    text: 'Lütfen tüm alanları doldurun.'
+                });
+                return false;
             }
-            return null;
+
+            // 2. Tarih ve saatleri birleştir
+            const pickupDateTime = new Date(`${pickupDate}T${pickupTime}`);
+            const dropoffDateTime = new Date(`${dropoffDate}T${dropoffTime}`);
+
+            // 3. Tarih validasyonu
+            if (dropoffDateTime <= pickupDateTime) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Geçersiz Tarih',
+                    text: 'Teslim tarihi ve saati, alış tarihinden sonra olmalıdır.'
+                });
+                return false;
+            }
+
+            // 4. Hata yok, Swal -> kapanınca step2'ye geçiş
+            Swal.fire({
+                icon: 'info',
+                title: 'Lütfen Bekleyin',
+                text: 'Seçtiğiniz lokasyondaki modeller aranıyor...',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            }).then(() => {
+                // Swal kapanınca 2. adıma geç
+                goToStep2();
+            });
+
+            return true;
         }
 
-        function calculateTotalPrice(car, pickupDateTime, dropoffDateTime) {
-            const pricingTypeToMinutes = {
-                1: 1,         // Dakika
-                2: 60,        // Saat
-                3: 1440,      // Gün
-                4: 10080,     // Hafta
-                5: 43200      // Ay (30 gün varsayımı)
+        function loadAvailableModels() {
+
+            let pickupLocationId = $("#pickupLocation").val();
+
+            if (!pickupLocationId) {
+                Swal.fire("Hata", "Lütfen geçerli bir alış lokasyonu seçiniz.", "error");
+                return;
+            }
+
+            // --- UI geçişi (Adım 1 → Adım 2) ---
+            $("#step-1").addClass("d-none");
+            $("#step-2").removeClass("d-none");
+
+            // Modeller yükleniyor mesajı
+            $("#modelsContainer").html(`
+                <div class="col-12 text-center my-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 fw-semibold">Modeller yükleniyor...</p>
+                </div>
+            `);
+
+            $.ajax({
+                url: "/Reservation/GetAvailableModels",
+                type: "GET",
+                data: { locationId: pickupLocationId },
+                success: function (models) {
+                    window.availableModels = models;
+                    renderModels(models);
+
+                    if (!models || models.length === 0) {
+                        $("#modelsContainer").html(`
+                            <div class="col-12 text-center text-danger fw-bold my-4">
+                                Bu lokasyonda uygun araç bulunamadı.
+                            </div>
+                        `);
+                        return;
+                    }
+
+                    renderModels(models);
+                },
+                error: function () {
+                    Swal.fire("Hata", "Modeller yüklenirken bir hata oluştu.", "error");
+                }
+            });
+        }
+
+        function renderModels(models) {
+
+            $("#modelsContainer").empty();
+
+            let pricings = @Html.Raw(Json.Serialize(pricings));
+
+            let totalMinutes = getTotalMinutes(
+                $("#pickupDate").val(),
+                $("#pickupTime").val(),
+                $("#dropoffDate").val(),
+                $("#dropoffTime").val()
+            );
+
+            let grouped = {};
+
+            models.forEach(m => {
+                let className = m.carClass.className;
+
+                if (!grouped[className]) grouped[className] = [];
+
+                grouped[className].push(m);
+            });
+
+            Object.keys(grouped).forEach(className => {
+
+                // Grup başlığı
+                $("#modelsContainer").append(`
+                    <div class="col-12">
+                        <h4 class="fw-bold mt-4 mb-3">${className}</h4>
+                    </div>
+                `);
+
+                grouped[className].forEach(model => {
+
+                    let price = calculateModelPrice(model, totalMinutes, pricings);
+
+                    let cardHtml = `
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                            <div class="model-card" data-model-id="${model.modelId}">
+
+                                <div class="model-image-container">
+                                    <img src="${model.coverImageUrl}" />
+                                </div>
+
+                                <div class="model-info text-center mt-2">
+                                    <h5 class="fw-bold">${model.brand.name}</h5>
+                                    <p class="m-0">${model.modelName}</p>
+
+                                    <div class="d-flex justify-content-center mt-2 gap-3">
+                                        <div class="d-flex align-items-center gap-1 mr-2">
+                                            <i class="bi bi-person-fill"></i> ${model.seat}
+                                        </div>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <i class="bi bi-luggage-fill mx-1"></i> ${model.luggage}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                    <div class="price-area">
+                                        <span class="fw-bold">${price.toLocaleString("tr-TR")} ₺</span>
+                                    </div>
+
+                                <div class="details-area">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-secondary btn-sm"
+                                        onclick="modelDetailModal(${model.modelId})">
+                                        ...
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    `;
+
+                    $("#modelsContainer").append(cardHtml);
+                });
+            });
+
+            attachModelEvents();
+        }
+
+        function attachModelEvents() {
+
+            // Hover efekti
+            $(".model-card").hover(
+                function () { $(this).addClass("model-hover"); },
+                function () { $(this).removeClass("model-hover"); }
+            );
+
+            // Model seçimi
+            $(".model-card").on("click", function () {
+
+                $(".model-card").removeClass("selected-model");
+
+                $(this).addClass("selected-model");
+
+                let selectedId = $(this).data("model-id");
+
+                $("#selectedModelId").val(selectedId); // → Eğer 3. adım için lazım olacaksa
+                window.selectedModel = window.availableModels.find(
+                    m => m.ModelId === selectedId || m.modelId === selectedId
+                );
+            });
+        }
+
+        function goToStep2() {
+            $("#step-1").addClass("d-none");
+            $("#step-2").removeClass("d-none");
+
+            loadAvailableModels();
+            $("html, body").animate({ scrollTop: 0 }, 300);
+        }
+
+        function backToStep1() {
+            $("#step-2").addClass("d-none");
+            $("#step-1").removeClass("d-none");
+
+            $("html, body").animate({ scrollTop: 0 }, 300);
+        }
+
+        function calculateModelPrice(model, totalMinutes, pricings) {
+
+            // Enum karşılıkları dakika cinsinden
+            const pricingDurations = {
+                1: 1,                 // Dakika
+                2: 60,                // Saat
+                3: 1440,              // Gün
+                4: 10080,             // Hafta (7 gün)
+                5: 43200,             // Ay (30 gün)
+                6: 518400             // Yıl (360 gün)
             };
 
-            let totalMinutes = Math.floor((dropoffDateTime - pickupDateTime) / (1000 * 60));
+            const modelPricings = model.modelPricings;
+
+            if (!modelPricings || modelPricings.length === 0) {
+                return 0;
+            }
+
+            // Pricings listesini süreye dönüştür
+            let pricingList = pricings.map(p => ({
+                pricingId: p.PricingId,
+                duration: pricingDurations[p.PricingType] * p.Quantity,  // dakika
+                pricingType: p.PricingType
+            }));
+
+            // En büyük süreden en küçüğe sırala
+            pricingList.sort((a, b) => b.duration - a.duration);
+
+            let remaining = totalMinutes;
             let totalPrice = 0;
 
-            if (!Array.isArray(car.pricings) || !Array.isArray(car.carPricings)) return 0;
+            for (let p of pricingList) {
 
-            let sortedPricings = [...car.pricings].sort((a, b) => {
-                if (b.pricingType === a.pricingType) {
-                    return b.quantity - a.quantity;
+                // Modelin bu pricing’e ait fiyatı
+                let modelPricing = modelPricings.find(mp => mp.pricingId === p.pricingId);
+                if (!modelPricing) continue;
+
+                // Bu süre rezervasyon süresine uyduğu sürece eklemeye devam et
+                while (remaining >= p.duration) {
+                    totalPrice += parseFloat(modelPricing.amount);
+                    remaining -= p.duration;
                 }
-                return b.pricingType - a.pricingType;
-            });
-
-            sortedPricings.forEach(pricing => {
-                let unitMinutes = pricingTypeToMinutes[pricing.pricingType] * pricing.quantity;
-                if (totalMinutes >= unitMinutes && unitMinutes > 0) {
-                    let count = Math.floor(totalMinutes / unitMinutes);
-                    totalMinutes -= count * unitMinutes;
-
-                    let carPricing = car.carPricings.find(cp => cp.pricingId === pricing.pricingId);
-                    if (carPricing && typeof carPricing.amount !== 'undefined') {
-                        totalPrice += Number(carPricing.amount) * count;
-                    }
-                }
-            });
+            }
 
             return totalPrice;
         }
 
-        function resetTimeConstraintsForPickup(loc) {
-            if (!loc || !loc.StartTime || !loc.EndTime) {
-                $pickupTime.attr('min', null).attr('max', null).val('');
-                return;
-            }
-            var start = loc.StartTime.substring(0,5);
-            var end = loc.EndTime.substring(0,5);
-            $pickupTime.attr('min', start);
-            $pickupTime.attr('max', end);
-            if ($pickupTime.val() && !timeWithinRange($pickupTime.val(), loc.StartTime, loc.EndTime)) {
-                $pickupTime.val('');
-            }
+        function getTotalMinutes(pickupDate, pickupTime, dropoffDate, dropoffTime) {
+            const start = new Date(`${pickupDate}T${pickupTime}`);
+            const end = new Date(`${dropoffDate}T${dropoffTime}`);
+
+            const diffMs = end - start;
+            return Math.floor(diffMs / 60000); // milisaniye → dakika
         }
 
-        function resetTimeConstraintsForDropoff(loc) {
-            if (!loc || !loc.StartTime || !loc.EndTime) {
-                $dropoffTime.attr('min', null).attr('max', null).val('');
-                return;
-            }
-            var start = loc.StartTime.substring(0,5);
-            var end = loc.EndTime.substring(0,5);
-            $dropoffTime.attr('min', start);
-            $dropoffTime.attr('max', end);
-            if ($dropoffTime.val() && !timeWithinRange($dropoffTime.val(), loc.StartTime, loc.EndTime)) {
-                $dropoffTime.val('');
-            }
-        }
+        function renderMileagePackages() {
 
-        function onPickupLocationChange() {
-            var val = $pickupSelect.val();
-            var loc = locations.find(l => l.LocationId == val);
-            if (loc) {
-                $pickupDetails.html(formatLocationDetailsHtml(loc)).show();
-                var today = new Date();
-                var next = getNextAvailableDate(loc, today) || today;
-                var minStr = next.toISOString().slice(0,10);
-                $pickupDate.attr('min', minStr);
+            $("#mileageContainer").empty();
 
-                var cur = $pickupDate.val();
-                if (!cur || cur < minStr) $pickupDate.val(minStr);
+            let mileagePackages = @Html.Raw(Json.Serialize(mileagePackages));
 
-                resetTimeConstraintsForPickup(loc);
-                updateDropoffMinFromPickup();
-            } else {
-                $pickupDetails.hide().html('');
-                $pickupDate.attr('min', new Date().toISOString().slice(0,10));
-                resetTimeConstraintsForPickup(null);
-            }
-            clearErrors();
-        }
+            mileagePackages.forEach(pkg => {
 
-        function onDropoffLocationChange() {
-            var val = $dropoffSelect.val();
-            var loc = locations.find(l => l.LocationId == val);
-            if (loc) {
-                $dropoffDetails.html(formatLocationDetailsHtml(loc)).show();
-                updateDropoffMinFromPickup();
-                resetTimeConstraintsForDropoff(loc);
-            } else {
-                $dropoffDetails.hide().html('');
-                $dropoffDate.attr('min', new Date().toISOString().slice(0,10));
-                resetTimeConstraintsForDropoff(null);
-            }
-            clearErrors();
-        }
+                let cardHtml = `
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                        <div class="mileage-card"
+                             data-package-id="${pkg.MileagePackageId}">
 
-        function updateDropoffMinFromPickup() {
-            var dropLocVal = $dropoffSelect.val();
-            var dropLoc = locations.find(l => l.LocationId == dropLocVal);
+                            <div class="text-center">
+                                <h5 class="fw-bold">${pkg.PackageName}</h5>
 
-            var pickVal = $pickupDate.val();
-            var startFrom = pickVal ? new Date(pickVal + 'T00:00:00') : new Date();
-            if (dropLoc) {
-                var next = getNextAvailableDate(dropLoc, startFrom) || startFrom;
-                var minStr = next.toISOString().slice(0,10);
-                $dropoffDate.attr('min', minStr);
+                                ${pkg.Description ? `<p class="text-muted small mb-2">${pkg.Description}</p>` : ""}
 
-                var curDrop = $dropoffDate.val();
-                if (!curDrop || curDrop < minStr) $dropoffDate.val(minStr);
-            } else {
-                var fallbackMin = startFrom.toISOString().slice(0,10);
-                $dropoffDate.attr('min', fallbackMin);
-                var curDrop = $dropoffDate.val();
-                if (!curDrop || curDrop < fallbackMin) $dropoffDate.val(fallbackMin);
-            }
-        }
-
-        function clearErrors() {
-            $pickupDateError.hide().text('');
-            $dropoffDateError.hide().text('');
-            $pickupTimeError.hide().text('');
-            $dropoffTimeError.hide().text('');
-        }
-
-        var $pickupSelect = $('#pickupLocation');
-        var $dropoffSelect = $('#dropoffLocation');
-        var $pickupDetails = $('#pickupDetails');
-        var $dropoffDetails = $('#dropoffDetails');
-
-        var $pickupDate = $('#pickupDate');
-        var $dropoffDate = $('#dropoffDate');
-        var $pickupTime = $('#pickupTime');
-        var $dropoffTime = $('#dropoffTime');
-
-        var $pickupDateError = $('#pickupDateError');
-        var $dropoffDateError = $('#dropoffDateError');
-        var $pickupTimeError = $('#pickupTimeError');
-        var $dropoffTimeError = $('#dropoffTimeError');
-
-        var $step1 = $('#step1');
-        var $step2 = $('#step2');
-        var $step3 = $('#step3');
-        var $carsList = $('#carsList');
-        var $nextStep2 = $('#nextStep2');
-        var selectedCarId = null;
-        var carsCache = {};
-
-        (function initDates() {
-            var today = new Date().toISOString().slice(0,10);
-            $pickupDate.attr('min', today);
-            $dropoffDate.attr('min', today);
-        })();
-
-        $pickupSelect.on('change', onPickupLocationChange);
-        $dropoffSelect.on('change', onDropoffLocationChange);
-
-        $pickupDate.on('change', function () {
-            clearErrors();
-            var val = $(this).val();
-            if (!val) return;
-            var locVal = $pickupSelect.val();
-            var loc = locations.find(l => l.LocationId == locVal);
-            if (loc) {
-                var d = new Date(val + 'T00:00:00');
-                if (!isLocationAvailableOnDate(loc, d)) {
-                    $pickupDateError.show().text('Seçtiğiniz lokasyon bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
-                    $(this).val('');
-                    return;
-                }
-            }
-            updateDropoffMinFromPickup();
-        });
-
-        $dropoffDate.on('change', function () {
-            clearErrors();
-            var val = $(this).val();
-            if (!val) return;
-            var locVal = $dropoffSelect.val();
-            var loc = locations.find(l => l.LocationId == locVal);
-            if (loc) {
-                var d = new Date(val + 'T00:00:00');
-                if (!isLocationAvailableOnDate(loc, d)) {
-                    $dropoffDateError.show().text('Seçtiğiniz teslim lokasyonu bu tarihte kapalı. Lütfen uygun bir tarih seçin.');
-                    $(this).val('');
-                    return;
-                }
-            }
-            var pick = $pickupDate.val();
-            if (pick && val < pick) {
-                $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
-                $(this).val('');
-                return;
-            }
-        });
-
-        $pickupTime.on('change', function () {
-            clearErrors();
-            var t = $(this).val();
-            var locVal = $pickupSelect.val();
-            var loc = locations.find(l => l.LocationId == locVal);
-            if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
-                $pickupTimeError.show().text('Seçtiğiniz saat, alış lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
-                $(this).val('');
-                return;
-            }
-        });
-
-        $dropoffTime.on('change', function () {
-            clearErrors();
-            var t = $(this).val();
-            var locVal = $dropoffSelect.val();
-            var loc = locations.find(l => l.LocationId == locVal);
-            if (loc && !timeWithinRange(t, loc.StartTime, loc.EndTime)) {
-                $dropoffTimeError.show().text('Seçtiğiniz saat, teslim lokasyonunun çalışma saatleri dışında. Lütfen uygun bir saat seçin.');
-                $(this).val('');
-                return;
-            }
-        });
-
-        $('#nextStep').off('click').on('click', function() {
-            clearErrors();
-
-            var pickLocId = $pickupSelect.val();
-            var dropLocId = $dropoffSelect.val();
-            var pickDate = $pickupDate.val();
-            var dropDate = $dropoffDate.val();
-            var pickTime = $pickupTime.val();
-            var dropTime = $dropoffTime.val();
-
-            if (!pickLocId) { alert('Lütfen alış lokasyonu seçin.'); return; }
-            if (!dropLocId) { alert('Lütfen teslim lokasyonu seçin.'); return; }
-            if (!pickDate) { $pickupDateError.show().text('Lütfen alış tarihini seçin.'); return; }
-            if (!dropDate) { $dropoffDateError.show().text('Lütfen teslim tarihini seçin.'); return; }
-            if (!pickTime) { $pickupTimeError.show().text('Lütfen alış saatini seçin.'); return; }
-            if (!dropTime) { $dropoffTimeError.show().text('Lütfen teslim saatini seçin.'); return; }
-
-            var pickLoc = locations.find(l => l.LocationId == pickLocId);
-            var dropLoc = locations.find(l => l.LocationId == dropLocId);
-
-            var pd = new Date(pickDate + 'T00:00:00');
-            if (!isLocationAvailableOnDate(pickLoc, pd)) {
-                $pickupDateError.show().text('Alış lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
-                return;
-            }
-
-            var dd = new Date(dropDate + 'T00:00:00');
-            if (!isLocationAvailableOnDate(dropLoc, dd)) {
-                $dropoffDateError.show().text('Teslim lokasyonu seçtiğiniz tarihte kapalı. Lütfen başka tarih seçin.');
-                return;
-            }
-
-            if (!timeWithinRange(pickTime, pickLoc.StartTime, pickLoc.EndTime)) {
-                $pickupTimeError.show().text('Alış saati lokasyonun çalışma saatleri arasında olmalı.');
-                return;
-            }
-            if (!timeWithinRange(dropTime, dropLoc.StartTime, dropLoc.EndTime)) {
-                $dropoffTimeError.show().text('Teslim saati lokasyonun çalışma saatleri arasında olmalı.');
-                return;
-            }
-
-            if (dropDate < pickDate) {
-                $dropoffDateError.show().text('Teslim tarihi, alış tarihinden önce olamaz.');
-                return;
-            }
-
-            $step1.hide();
-            $step2.show();
-
-            fetchAvailableCars(pickLocId);
-        });
-
-        function fetchAvailableCars(locationId) {
-            $carsList.html('<p>Yükleniyor...</p>');
-            $nextStep2.prop('disabled', true);
-            selectedCarId = null;
-            carsCache = {}; // temizle
-
-            $.ajax({
-                url: `/Reservation/GetAvailableCars?locationId=${locationId}`,
-                method: 'GET',
-                success: function(data) {
-                    if (!data || !data.length) {
-                        $carsList.html('<p>Seçilen lokasyonda uygun araç bulunamadı.</p>');
-                        return;
-                    }
-
-                    $carsList.empty();
-
-                    var pickDateVal = $pickupDate.val();
-                    var pickTimeVal = $pickupTime.val();
-                    var dropDateVal = $dropoffDate.val();
-                    var dropTimeVal = $dropoffTime.val();
-
-                    var pickupDateTime = null;
-                    var dropoffDateTime = null;
-                    if (pickDateVal && pickTimeVal && dropDateVal && dropTimeVal) {
-                        pickupDateTime = new Date(pickDateVal + 'T' + pickTimeVal + ':00');
-                        dropoffDateTime = new Date(dropDateVal + 'T' + dropTimeVal + ':00');
-                        if (isNaN(pickupDateTime.getTime()) || isNaN(dropoffDateTime.getTime())) {
-                            pickupDateTime = null;
-                            dropoffDateTime = null;
-                        }
-                    }
-                    var validRange = pickupDateTime && dropoffDateTime && dropoffDateTime > pickupDateTime;
-
-                    data.forEach(function(car) {
-                        carsCache[car.carId] = car;
-
-                        var dailyPricing = (car.pricings || []).find(p => p.pricingType === 3 && p.quantity === 1);
-                        var dailyPrice = null;
-                        if (dailyPricing && Array.isArray(car.carPricings)) {
-                            var carPricing = car.carPricings.find(cp => cp.pricingId === dailyPricing.pricingId);
-                            if (carPricing && typeof carPricing.amount !== 'undefined') {
-                                dailyPrice = Number(carPricing.amount);
-                            }
-                        }
-
-                        var totalPrice = null;
-                        if (validRange) {
-                            try {
-                                totalPrice = calculateTotalPrice(car, pickupDateTime, dropoffDateTime);
-                                if (isNaN(totalPrice) || totalPrice < 0) totalPrice = null;
-                            } catch (err) {
-                                console.error('Fiyat hesaplama hatası:', err);
-                                totalPrice = null;
-                            }
-                        }
-
-                        $("#selectedCarPrice").val(totalPrice);
-
-                        var cardHtml = `
-                            <div class="col-md-4 mb-3">
-                              <div class="card car-card h-100" data-carid="${car.carId}" style="cursor:pointer; transition: transform 0.2s;">
-                                <img src="${car.coverImageUrl || '/images/no-image.png'}" class="card-img-top" alt="${car.model || ''}">
-                                <div class="card-body d-flex flex-column">
-                                  <h5 class="card-title mb-2">${(car.brand && car.brand.name) ? car.brand.name : '-'} - ${car.model || '-'}</h5>
-
-                                  <div class="mb-1"><strong>Vites:</strong> ${car.transmission === 1 ? 'Manuel' : (car.transmission === 2 ? 'Otomatik' : '-')}</div>
-                                  <div class="mb-1"><strong>Bagaj:</strong> ${car.luggage ?? '-'} Bagaj</div>
-                                  <div class="mb-1"><strong>Koltuk:</strong> ${car.seat ?? '-'} Koltuk</div>
-                                  <div class="mb-1"><strong>Sınıf:</strong> ${car.carClass?.className || '-'}</div>
-
-                                  <div class="mt-auto">
-                                    <p class="card-text text-success fw-bold mb-1">
-                                      ${dailyPrice !== null ? `Günlük: ${Number(dailyPrice).toLocaleString('tr-TR')} TL` : '<span class="text-muted">Günlük fiyat: bilgi yok</span>'}
-                                    </p>
-                                    <p class="card-text text-primary fw-bold mb-2">
-                                      ${totalPrice !== null ? `Toplam: ${Number(totalPrice).toLocaleString('tr-TR')} TL`
-                                                           : (validRange ? '<span class="text-muted">Toplam hesaplanamadı</span>'
-                                                                          : '<span class="text-muted">Tarih/Saat seçimi yapınız</span>')}
-                                    </p>
-
-                                    <div class="d-grid gap-2">
-                                      <button class="btn btn-sm btn-outline-primary car-detail-btn" data-carid="${car.carId}">Araç Detayı</button>
-                                      <button class="btn btn-sm btn-outline-success select-car-btn" data-carid="${car.carId}">Bu Aracı Seç</button>
-                                    </div>
-                                  </div>
+                                <div class="fw-semibold mb-2">
+                                    ${pkg.PackageLimit === 2147483647
+                                        ? "Sınırsız"
+                                        : `${pkg.PackageLimit.toLocaleString("tr-TR")} KM`
+                                    }
                                 </div>
-                              </div>
-                            </div>`;
+                            </div>
 
-                        $carsList.append(cardHtml);
-                    });
+                            <div class="price-area text-success fw-bold">
+                                ${pkg.Amount.toLocaleString("tr-TR")} ₺
+                            </div>
 
-                    $('.car-card').hover(
-                        function() { $(this).css('transform', 'scale(1.05)').css('z-index','5'); },
-                        function() { $(this).css('transform', 'scale(1)').css('z-index','1'); }
+                        </div>
+                    </div>
+                `;
+
+                $("#mileageContainer").append(cardHtml);
+            });
+
+            attachMileageEvents();
+        }
+
+        function attachMileageEvents() {
+
+            $(".mileage-card")
+                .hover(
+                    function () {
+                        $(this).addClass("model-hover");
+                    },
+                    function () {
+                        $(this).removeClass("model-hover");
+                    }
+                )
+                .click(function () {
+
+                    $(".mileage-card").removeClass("selected-model");
+
+                    $(this).addClass("selected-model");
+
+                    selectedMileagePackageId = $(this).data("package-id");
+
+                    let mileagePackages = @Html.Raw(Json.Serialize(mileagePackages));
+
+                    window.selectedMileagePackage = mileagePackages.find(
+                        p => p.MileagePackageId === selectedMileagePackageId
                     );
-                },
-                error: function() {
-                    $carsList.html('<p>Araçlar yüklenirken hata oluştu.</p>');
-                }
+                });
+        }
+
+        function renderSecurityPackages() {
+
+            $("#securityContainer").empty();
+
+            let securityPackages = @Html.Raw(Json.Serialize(securityPackages));
+
+            securityPackages.forEach(pkg => {
+
+                let optionsHtml = "";
+
+                pkg.SecurityPackageOptions.forEach(opt => {
+                    optionsHtml += `
+                        <div class="col-12 mb-2">
+                            <span class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                <span>${opt}</span>
+                            </span>
+                        </div>
+                    `;
+                });
+
+                let cardHtml = `
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <div class="security-card"
+                             data-security-package-id="${pkg.SecurityPackageId}">
+
+                            <div class="text-center mb-3">
+                                <h5 class="fw-bold">${pkg.PackageName}</h5>
+                            </div>
+
+                            <div class="price-area text-success fw-bold">
+                                ${pkg.Amount.toLocaleString("tr-TR")} ₺
+                            </div>
+
+                            <hr />
+
+                            <div class="row">
+                                ${optionsHtml}
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+
+                $("#securityContainer").append(cardHtml);
+            });
+
+            attachSecurityEvents();
+        }
+
+        function attachSecurityEvents() {
+
+            $(".security-card").off("click").on("click", function () {
+
+                // Diğer tüm seçimleri kaldır
+                $(".security-card").removeClass("selected-security");
+
+                // Tıklananı seç
+                $(this).addClass("selected-security");
+
+                // Seçilen paketi sakla
+                selectedSecurityPackageId = $(this).data("security-package-id");
+
+                let securityPackages = @Html.Raw(Json.Serialize(securityPackages));
+
+                window.selectedSecurityPackage = securityPackages.find(
+                    p => p.SecurityPackageId === selectedSecurityPackageId
+                );
+
             });
         }
 
-        $(document).on('click', '.car-detail-btn', function () {
-            var carId = $(this).data('carid');
-            var car = carsCache[carId];
-            if (!car) return;
+        function renderReservationSummary() {
 
-            $('#detailImage').attr('src', car.bigImageUrl || car.coverImageUrl || '/images/no-image.png');
-            $('#detailTitle').text(`${car.brand?.name || '-'} ${car.model || '-'}`);
-            $('#detailStock').text(car.stockNumber || '-');
-            $('#detailClass').text(car.carClass?.className || '-');
-            $('#detailLocation').text(car.locationName || '-');
-            $('#detailYear').text(car.year || '-');
-            $('#detailTransmission').text(car.transmission === 1 ? 'Manuel' : (car.transmission === 2 ? 'Otomatik' : '-'));
-            $('#detailFuel').text(car.fuel === 1 ? 'Benzin' : car.fuel === 2 ? 'Dizel' : 'Diğer');
-            $('#detailSeat').text(car.seat ? (car.seat + ' Koltuk') : '-');
-            $('#detailLuggage').text(car.luggage ? (car.luggage + ' Bagaj') : '-');
+            // Step geçişleri
+            $(".reservation-step").addClass("d-none");
+            $("#step-5").removeClass("d-none");
 
-            if (car.featureNames && car.featureNames.length) {
-                $('#detailFeaturesWrapper').show();
-                $('#detailFeatures').empty();
-                car.featureNames.forEach(function (feature) {
-                    $('#detailFeatures').append(`<div class="col-md-3 mb-2"><span class="text-success fw-bold">•</span> ${feature}</div>`);
-                });
-            } else {
-                $('#detailFeaturesWrapper').hide();
-            }
+            // Lokasyon & Tarih
+            $("#summaryPickupLocation").text(
+                $("#pickupLocation option:selected").text()
+            );
 
-            $('#detailDescription').text(car.description || '');
+            $("#summaryDropoffLocation").text(
+                $("#dropoffLocation option:selected").text()
+            );
 
-            $('#carDetailModal').modal('show');
-        });
+            $("#summaryDateTime").text(
+                `${$("#pickupDate").val()} ${$("#pickupTime").val()} →
+                 ${$("#dropoffDate").val()} ${$("#dropoffTime").val()}`
+            );
 
-        $(document).on('click', '.select-car-btn', function () {
-            var carId = $(this).data('carid');
-            if (!carId) return;
+            // Seçilen model
+            let model = window.selectedModel;
+            let mileage = window.selectedMileagePackage;
+            let security = window.selectedSecurityPackage;
 
-            $('.car-card').removeClass('border-primary');
-            $(`.car-card[data-carid="${carId}"]`).addClass('border-primary');
+            let totalMinutes = getTotalMinutes(
+                $("#pickupDate").val(),
+                $("#pickupTime").val(),
+                $("#dropoffDate").val(),
+                $("#dropoffTime").val()
+            );
 
-            selectedCarId = carId;
-            $nextStep2.prop('disabled', false);
-            $("#selectedCarId").val(carId);
-        });
+            let pricings = @Html.Raw(Json.Serialize(pricings));
 
-        $nextStep2.off('click').on('click', function () {
-            if (!selectedCarId) {
-                alert('Lütfen bir araç seçin.');
+            let modelPrice = calculateModelPrice(model, totalMinutes, pricings);
+
+            // Model kartı
+            $("#summaryModel").html(`
+                <div class="model-card">
+                    <div class="model-image-container">
+                        <img src="${model.coverImageUrl}" />
+                    </div>
+                    <div class="text-center mt-2">
+                        <strong>${model.brand.name} ${model.modelName}</strong>
+                    </div>
+                </div>
+            `);
+
+            // Mileage kartı
+            $("#summaryMileage").html(`
+                <div class="mileage-card text-center">
+                    <strong>${mileage.PackageName}</strong><br/>
+                    ${mileage.Description}
+                    <div class="fw-semibold mb-2">
+                        ${mileage.PackageLimit === 2147483647 ? "Sınırsız" : mileage.PackageLimit + " KM"}
+                    </div>
+                </div>
+            `);
+
+            // Security kartı
+            $("#summarySecurity").html(`
+                <div class="security-card text-center">
+                    <strong>${security.PackageName}</strong>
+                </div>
+            `);
+
+            // Fiyatlar
+            $("#summaryModelPrice").text(modelPrice.toLocaleString("tr-TR") + " ₺");
+            $("#summaryMileagePrice").text(mileage.Amount.toLocaleString("tr-TR") + " ₺");
+            $("#summarySecurityPrice").text(security.Amount.toLocaleString("tr-TR") + " ₺");
+
+            window.totalReservationPrice =
+                Number(modelPrice) +
+                Number(mileage.Amount) +
+                Number(security.Amount);
+
+            $("#summaryTotalPrice").text(window.totalReservationPrice.toLocaleString("tr-TR") + " ₺");
+        }
+
+        function submitReservation() {
+
+            // 🔒 Zorunlu seçim kontrolleri
+            if (!window.selectedModel) {
+                Swal.fire("Uyarı", "Lütfen bir araç modeli seçin", "warning");
                 return;
             }
 
-            if ($('#selectedCarId').length === 0) {
-                $('<input>').attr({ type: 'hidden', id: 'selectedCarId', name: 'SelectedCarId', value: selectedCarId }).appendTo($('#reservationForm'));
-            } else {
-                $('#selectedCarId').val(selectedCarId);
+            if (!window.selectedMileagePackage) {
+                Swal.fire("Uyarı", "Lütfen bir kilometre paketi seçin", "warning");
+                return;
             }
 
-            $step2.hide();
-            $step3.show();
+            if (!window.selectedSecurityPackage) {
+                Swal.fire("Uyarı", "Lütfen bir güvenlik paketi seçin", "warning");
+                return;
+            }
 
-            $('html, body').animate({ scrollTop: $step3.offset().top - 20 }, 300);
-        });
-
-        $('#backToStep1').on('click', function () {
-            $step2.hide();
-            $step1.show();
-        });
-
-        $(document).on('click', '#backToStep2', function () {
-            $step3.hide();
-            $step2.show();
-        });
-
-        $(document).on('click', '.mileage-card', function () {
-            $('.mileage-card').removeClass('border-primary shadow');
-            $(this).addClass('border-primary shadow');
-
-            $("#selectedMileagePackageId").val($(this).data("id"));
-            $("#nextStep3").prop("disabled", false);
-        });
-
-        $(document).on('click', '#finishReservation', function () {
-            let carPrice = parseFloat($("#selectedCarPrice").val()) || 0;
-            let mileagePrice = parseFloat($(".mileage-card.shadow").data("amount")) || 0;
-            let securityPrice = parseFloat($(".security-card.shadow").data("amount")) || 0;
-            let totalAmount = carPrice + mileagePrice + securityPrice;
-
-            console.log('carPrice:', carPrice);
-            console.log('mileagePrice:', mileagePrice);
-            console.log('securityPrice:', securityPrice);
-
+            // 📦 ViewModel
             let reservationData = {
-                PickUpLocationId: $("#pickupLocation").val(),
-                DropOffLocationId: $("#dropoffLocation").val(),
-                PickUpDate: $("#pickupDate").val(),
+                PickUpLocationId: parseInt($("#pickupLocation").val()),
+                DropOffLocationId: parseInt($("#dropoffLocation").val()),
+
+                PickUpDate: $("#pickupDate").val(),       // yyyy-MM-dd
                 DropOffDate: $("#dropoffDate").val(),
-                PickUpTime: $("#pickupTime").val(),
+
+                PickUpTime: $("#pickupTime").val(),       // HH:mm
                 DropOffTime: $("#dropoffTime").val(),
-                CarId: $("#selectedCarId").val(),
-                MileagePackageId: $("#selectedMileagePackageId").val(),
-                SecurityPackageId: $("#selectedSecurityPackageId").val(),
-                TotalAmount: totalAmount
+
+                MileagePackageId: window.selectedMileagePackage.MileagePackageId,
+                SecurityPackageId: window.selectedSecurityPackage.SecurityPackageId,
+
+                CreatedTime: new Date().toISOString(),
+                UpdatedTime: new Date().toISOString(),
+
+                TotalAmount: window.totalReservationPrice // özet ekranında hesapladığımız toplam
             };
 
-            console.log("Gönderilecek rezervasyon verisi:", reservationData);
+            let data = {
+                modelId: window.selectedModel.modelId,   // 👈 AYRI GÖNDERİLİYOR
+                reservation: reservationData
+            };
 
             $.ajax({
-                url: '/Reservation/CreateReservation',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(reservationData),
+                url: "/Reservation/CreateReservation",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(data),
                 success: function (response) {
-                    alert("Rezervasyon başarıyla oluşturuldu!");
-                    window.location.href = "/Home/Index";
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Rezervasyon Oluşturuldu",
+                        text: "Rezervasyonunuz başarıyla oluşturuldu.",
+                        confirmButtonText: "Tamam"
+                    }).then(() => {
+                        window.location.href = "/Home/Index";
+                    });
                 },
                 error: function (xhr) {
-                    alert("Rezervasyon sırasında bir hata oluştu.");
+
+                    Swal.fire(
+                        "Hata",
+                        xhr.responseText || "Rezervasyon oluşturulurken hata oluştu",
+                        "error"
+                    );
                 }
             });
+        }
+
+        window.modelDetailModal = function (modelId) {
+
+            let features = @Html.Raw(Json.Serialize(features));
+
+            // Daha önce çektiğimiz modeller arasından buluyoruz
+            let model = window.availableModels.find(m => m.modelId === modelId);
+            if (!model) return;
+
+            $("#modelDetailTitle").text(`${model.brand.name} ${model.modelName}`);
+            $("#modelDetailImage").attr("src", model.bigImageUrl || model.coverImageUrl);
+            $("#modelDetailDescription").text(model.modelDescription);
+
+            $("#detailSeat").text(model.seat);
+            $("#detailLuggage").text(model.luggage);
+            $("#detailClass").text(model.carClass.className);
+
+            // Feature alanını temizle
+            $("#modelFeaturesContainer").empty();
+
+            // Tüm feature'ları dolaş
+            features.forEach(f => {
+
+                let modelFeature = model.modelFeatures.find(mf => mf.featureId === f.FeatureId);
+                let available = modelFeature && modelFeature.available;
+
+                if(available){
+                    $("#modelFeaturesContainer").append(`
+                    <div class="col-md-6 mb-2">
+                        <span class="d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-success mr-1"></i>
+                            <span>${f.FeatureName}</span>
+                        </span>
+                    </div>
+                `);
+                }
+            });
+
+            // Modalı aç
+            let modal = new bootstrap.Modal(document.getElementById("modelDetailModal"));
+            modal.show();
+        }
+
+        // --- Sonraki Adım Butonuna Tıklama ---
+        $("#nextStep1").on("click", function (e) {
+            e.preventDefault();
+            validateStep1();
         });
 
-        $(document).on('keydown', '.mileage-card', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                $(this).trigger('click');
-            }
+        $("#nextStep2").on("click", function (e) {
+            e.preventDefault();
+
+            renderMileagePackages();
+
+            // TÜM adımları gizle
+            $(".reservation-step").addClass("d-none");
+
+            // SADECE step-3'ü aç
+            $("#step-3").removeClass("d-none");
+
+            // Sayfayı yukarı al
+            $("html, body").animate({ scrollTop: 0 }, 300);
         });
 
-        $(document).on('click', '#nextStep3', function () {
-            if ($("#selectedMileagePackageId").val() === "") {
-                alert("Lütfen bir kilometre paketi seçin.");
-                return;
-            }
-            $("#step3").hide();
-            $("#step4").show();
+        $("#nextStep3").on("click", function (e) {
+            e.preventDefault();
+
+            renderSecurityPackages();
+
+            // TÜM adımları gizle
+            $(".reservation-step").addClass("d-none");
+
+            // SADECE step-3'ü aç
+            $("#step-4").removeClass("d-none");
+
+            // Sayfayı yukarı al
+            $("html, body").animate({ scrollTop: 0 }, 300);
         });
 
-        $(".security-card").click(function () {
-            $(".security-card").removeClass("border-primary shadow");
-            $(this).addClass("border-primary shadow");
-            $("#selectedSecurityPackageId").val($(this).data("id"));
-            $("#finishReservation").prop("disabled", false);
+        $("#prevStep2").on("click", backToStep1);
+
+        $("#prevStep3").on("click", function () {
+
+            $(".reservation-step").addClass("d-none");
+            $("#step-2").removeClass("d-none");
+
+            $("html, body").animate({ scrollTop: 0 }, 300);
         });
 
-        $("#backToStep3").click(function () {
-            $("#step4").hide();
-            $("#step3").show();
+        $("#prevStep4").on("click", function () {
+
+            $(".reservation-step").addClass("d-none");
+            $("#step-3").removeClass("d-none");
+
+            $("html, body").animate({ scrollTop: 0 }, 300);
         });
+
+        $("#showSummary").on("click", function () {
+            renderReservationSummary();
+        });
+
+        $("#prevStep5").on("click", function () {
+            $("#step-5").addClass("d-none");
+            $("#step-4").removeClass("d-none");
+        });
+
+        $("#confirmReservation").on("click", function () {
+            submitReservation();
+        });
+
+        // --- Sayfa açıldığında fonksiyonu çalıştır ---
+        populateLocations();
 
     });
 </script>

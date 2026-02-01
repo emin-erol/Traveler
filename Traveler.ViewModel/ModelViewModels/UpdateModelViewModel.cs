@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.ViewModel.BrandViewModels;
-using Traveler.ViewModel.CarClassViewModels;
 
 namespace Traveler.ViewModel.ModelViewModels
 {
@@ -17,7 +15,7 @@ namespace Traveler.ViewModel.ModelViewModels
         public byte Seat { get; set; }
         public byte Luggage { get; set; }
         public string BigImageUrl { get; set; }
-        public ResultBrandViewModel Brand { get; set; }
-        public ResultCarClassViewModel CarClass { get; set; }
+        public int BrandId { get; set; }
+        public int CarClassId { get; set; }
     }
 }

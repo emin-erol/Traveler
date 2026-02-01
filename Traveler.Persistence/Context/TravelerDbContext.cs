@@ -19,15 +19,14 @@ namespace Traveler.Persistence.Context
         public DbSet<Car> Cars { get; set; }
         public DbSet<Footer> Footers { get; set; }
         public DbSet<Service> Services { get; set; }
-        public DbSet<CarFeature> CarFeatures { get; set; }
-        public DbSet<CarPricing> CarPricings { get; set; }
+        public DbSet<ModelFeature> ModelFeatures { get; set; }
+        public DbSet<ModelPricing> ModelPricings { get; set; }
         public DbSet<Pricing> Pricings { get; set; }
         public DbSet<Feature> Features { get; set; }
         public DbSet<CarClass> CarClasses { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<MileagePackage> MileagePackages { get; set; }
         public DbSet<City> Cities { get; set; }
-        public DbSet<LocationAvailability> LocationAvailabilities { get; set; }
         public DbSet<SecurityPackage> SecurityPackages { get; set; }
         public DbSet<PackageOption> PackageOptions { get; set; }
         public DbSet<SecurityPackageOption> SecurityPackageOptions { get; set; }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.ViewModel.BrandViewModels;
-using Traveler.ViewModel.CarClassViewModels;
 
 namespace Traveler.ViewModel.CarViewModels
 {
@@ -23,6 +21,5 @@ namespace Traveler.ViewModel.CarViewModels
         public DateTime CreatedTime { get; set; }
         public DateTime UpdatedTime { get; set; }
         public DateTime LastUsedTime { get; set; }
-        public List<int> SelectedFeatureIds { get; set; }
     }
 }

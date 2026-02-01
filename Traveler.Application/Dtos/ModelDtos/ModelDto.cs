@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Traveler.Application.Dtos.BrandDtos;
 using Traveler.Application.Dtos.CarClassDtos;
+using Traveler.Application.Dtos.ModelFeatureDtos;
+using Traveler.Application.Dtos.ModelPricingDtos;
 
 namespace Traveler.Application.Dtos.ModelDtos
 {
@@ -19,5 +21,7 @@ namespace Traveler.Application.Dtos.ModelDtos
         public string BigImageUrl { get; set; }
         public BrandDto Brand { get; set; }
         public CarClassDto CarClass { get; set; }
+        public List<ModelFeatureDto> ModelFeatures { get; set; }
+        public List<ModelPricingDto> ModelPricings { get; set; }
     }
 }

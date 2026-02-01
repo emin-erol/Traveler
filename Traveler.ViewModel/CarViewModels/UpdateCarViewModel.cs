@@ -22,6 +22,5 @@ namespace Traveler.ViewModel.CarViewModels
         public DateTime CreatedTime { get; set; }
         public DateTime UpdatedTime { get; set; }
         public DateTime LastUsedTime { get; set; }
-        public List<int> SelectedFeatureIds { get; set; }
     }
 }

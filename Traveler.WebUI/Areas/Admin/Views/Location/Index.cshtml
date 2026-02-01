@@ -1,4 +1,4 @@
-﻿@model List<GetLocationWithCityAndAvailabilityViewModel>
+﻿@model List<GetLocationWithCityViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -23,8 +23,6 @@
                                         <th>#</th>
                                         <th>Lokasyon Adı</th>
                                         <th>Bulunduğu İl</th>
-                                        <th>Kullanılan Saat Aralıkları</th>
-                                        <th>Kullanılan Gün Aralıkları</th>
                                         <th>Sil</th>
                                         <th>Güncelle</th>
                                     </tr>
@@ -37,29 +35,6 @@
                                             <td>@count</td>
                                             <td>@item.LocationName</td>
                                             <td>@(((CityEnum)item.City.CityName).ToString())</td>
-                                            <td>@item.StartTime - @item.EndTime</td>
-                                            <td>
-                                                <div class="d-flex flex-wrap">
-                                                    @foreach (var day in item.LocationAvailabilities.OrderBy(x => x.DayOfWeek))
-                                                    {
-                                                        var dayName = Enum.GetName(typeof(DayOfWeekEnum), day.DayOfWeek);
-                                                        var isAvailable = day.IsAvailable;
-
-                                                        <div style="width: 50%; font-size: 11px;">
-                                                            @if (isAvailable)
-                                                            {
-                                                                <span style="color: green;">✔️</span> 
-                                                                @dayName
-                                                            }
-                                                            else
-                                                            {
-                                                                <span style="color: red;">❌</span> 
-                                                                @dayName
-                                                            }
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </td>
                                             <td>
                                                 <a href="/Admin/Location/RemoveLocation/@item.LocationId" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-trash-alt"></i>

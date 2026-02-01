@@ -47,6 +47,30 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
+        [HttpGet("GetModelWithAllDetails/{modelId}")]
+        public async Task<IActionResult> GetModelWithAllDetails(int modelId)
+        {
+            var value = await _modelDal.GetModelWithAllDetails(modelId);
+
+            return Ok(value);
+        }
+
+        [HttpGet("GetAllModelsWithDetailsByLocation/{locationId}")]
+        public async Task<IActionResult> GetAllModelsWithDetailsByLocation(int locationId)
+        {
+            var values = await _modelDal.GetAllModelsWithDetailsByLocation(locationId);
+
+            return Ok(values);
+        }
+
+        [HttpGet("GetMostSuitableCarIdByModelId/{modelId}/{locationId}/{pickUpDate}/{dropOffDate}")]
+        public async Task<IActionResult> GetMostSuitableCarIdByModelId(int modelId, int locationId, DateOnly pickUpDate, DateOnly dropOffDate)
+        {
+            var value = await _modelDal.GetMostSuitableCarIdByModelId(modelId, locationId, pickUpDate, dropOffDate);
+
+            return Ok(value);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateModel(CreateModelDto model)
         {
@@ -64,7 +88,7 @@ namespace Traveler.WebApi.Controllers
 
             await _modelDal.CreateAsync(modelDto);
 
-            return Ok("Model information has been created.");
+            return Ok(modelDto);
         }
 
         [HttpPut]

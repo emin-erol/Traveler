@@ -22,7 +22,7 @@ namespace Traveler.WebUI.ViewComponents.RentACarViewComponents
             if (response.IsSuccessStatusCode)
             {
                 var jsonData = await response.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<List<GetLocationWithCityAndAvailabilityViewModel>>(jsonData);
+                var values = JsonConvert.DeserializeObject<List<GetLocationWithCityViewModel>>(jsonData);
 
                 return View(values);
             }

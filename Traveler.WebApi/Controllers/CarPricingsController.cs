@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Traveler.Application.Dtos.CarPricingDtos;
+using Traveler.Application.Dtos.ModelPricingDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
 
@@ -8,75 +8,75 @@ namespace Traveler.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CarPricingsController : ControllerBase
+    public class ModelPricingsController : ControllerBase
     {
-        private readonly ICarPricingDal _carPricingDal;
+        private readonly IModelPricingDal _modelPricingDal;
 
-        public CarPricingsController(ICarPricingDal carPricingDal)
+        public ModelPricingsController(IModelPricingDal modelPricingDal)
         {
-            _carPricingDal = carPricingDal;
+            _modelPricingDal = modelPricingDal;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCarPricings()
+        public async Task<IActionResult> GetAllModelPricings()
         {
-            var values = await _carPricingDal.GetAllAsync();
+            var values = await _modelPricingDal.GetAllAsync();
             return Ok(values);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCarPricingById(int id)
+        public async Task<IActionResult> GetModelPricingById(int id)
         {
-            var value = await _carPricingDal.GetByIdAsync(id);
+            var value = await _modelPricingDal.GetByIdAsync(id);
             return Ok(value);
         }
 
-        [HttpGet("GetCarPricingsByCarId/{carId}")]
-        public async Task<IActionResult> GetCarPricingsByCarId(int carId)
+        [HttpGet("GetModelPricingsByModelId/{modelId}")]
+        public async Task<IActionResult> GetModelPricingsByModelId(int modelId)
         {
-            var values = await _carPricingDal.GetCarPricingsByCarId(carId);
+            var values = await _modelPricingDal.GetModelPricingsByModelId(modelId);
 
             return Ok(values);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCarPricing(CreateCarPricingDto model)
+        public async Task<IActionResult> CreateModelPricing(CreateModelPricingDto model)
         {
-            var carPricing = new CarPricing
+            var modelPricing = new ModelPricing()
             {
-                CarId = model.CarId,
+                ModelId = model.ModelId,
                 Amount = model.Amount,
                 PricingId = model.PricingId,
             };
 
-            await _carPricingDal.CreateAsync(carPricing);
+            await _modelPricingDal.CreateAsync(modelPricing);
 
-            return Ok("CarPricing information has been created.");
+            return Ok("ModelPricing information has been created.");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCarPricing(UpdateCarPricingDto model)
+        public async Task<IActionResult> UpdateModelPricing(UpdateModelPricingDto model)
         {
-            var carPricing = new CarPricing
+            var modelPricing = new ModelPricing
             {
-                CarPricingId = model.CarPricingId,
-                CarId = model.CarId,
+                ModelPricingId = model.ModelPricingId,
+                ModelId = model.ModelId,
                 Amount = model.Amount,
                 PricingId = model.PricingId,
             };
-            await _carPricingDal.UpdateAsync(carPricing);
+            await _modelPricingDal.UpdateAsync(modelPricing);
 
-            return Ok("CarPricing information has been updated.");
+            return Ok("ModelPricing information has been updated.");
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveCarPricing(int id)
+        public async Task<IActionResult> RemoveModelPricing(int id)
         {
-            var value = await _carPricingDal.GetByIdAsync(id);
+            var value = await _modelPricingDal.GetByIdAsync(id);
 
-            await _carPricingDal.RemoveAsync(value);
+            await _modelPricingDal.RemoveAsync(value);
 
-            return Ok("CarPricing information has been removed.");
+            return Ok("ModelPricing information has been removed.");
         }
     }
 }

@@ -1,0 +1,8 @@
+1. Rezervasyon oluþturma iþleminin 2. adýmýnda Önceki adým - sonraki adým butonlarý eklendi.
+Önceki adým butonuna basýldýðýnda 1. adýmýn dolu bir þekilde geri yüklenmesi saðlandý. tekrar ikinci sayfaya geçmek 
+için Devam et butonuna basýldýðýnda hatasýz bir þekilde ikinci adýmýn açýlmasý saðlandý. Sýrada 2. adýmda listelenen
+araçlarýn seçilebilirliðini saðlamak ve seçilen aracýn bilgilerini kaydetmek var. Ardýndan 3. adým oluþturulacak.
+
+2. Rezervasyon iþlemlerinin 3. adýmý uygulandý.
+	- 2. adýmdan 3. adýma geçerken modelin seçilip seçilmediði kontrol edilmiyor.
+	- Listelenen modellerde detay butonuna týklandýðýnda model seçiliyor.

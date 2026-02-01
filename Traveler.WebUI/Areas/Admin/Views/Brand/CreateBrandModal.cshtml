@@ -1,4 +1,4 @@
-﻿@model CreateBrandViewModel
+﻿@model ResultBrandViewModel
 
 @{
     ViewData["Title"] = "CreateBrandModal";
@@ -13,15 +13,13 @@
                     <div class="card-body">
                         <h4 class="card-title">Yeni Marka Oluştur</h4>
                         <p class="card-subtitle mb-4">
-                            Eklemek istediğiniz yeni markayı lütfen doğru giriniz ve kaydet butonuna basınız.
+                            Eklemek istediğiniz yeni marka bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
                         </p>
                         <form method="post" asp-action="CreateBrand" asp-controller="Brand">
 
-                            <div class="row mb-3">
-                                <label asp-for="Name" class="col-sm-3 col-form-label text-end">Marka Adı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Name" class="form-control" />
-                                </div>
+                            <div class="form-group">
+                                <label for="brandName">Marka Adı</label>
+                                <input type="text" class="form-control" id="brandName" asp-for="Name" placeholder="Marka adını giriniz" required>
                             </div>
 
                             <button type="submit" class="btn btn-primary waves-effect waves-light">Markayı Kaydet</button>

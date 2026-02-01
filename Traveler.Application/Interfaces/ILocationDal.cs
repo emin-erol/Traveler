@@ -10,6 +10,6 @@ namespace Traveler.Application.Interfaces
 {
     public interface ILocationDal : IGenericDal<Location>
     {
-        Task<List<GetLocationWithCityAndAvailabilityDto>> GetLocationWithCityAndAvailability();
+        Task<List<GetLocationWithCityDto>> GetLocationWithCity();
     }
 }

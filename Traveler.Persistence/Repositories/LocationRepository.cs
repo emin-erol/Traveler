@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Traveler.Application.Dtos.CityDtos;
-using Traveler.Application.Dtos.LocationAvailabilityDtos;
 using Traveler.Application.Dtos.LocationDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
@@ -46,32 +45,22 @@ namespace Traveler.Persistence.Repositories
             await base.UpdateAsync(entity);
         }
 
-        public async Task<List<GetLocationWithCityAndAvailabilityDto>> GetLocationWithCityAndAvailability()
+        public async Task<List<GetLocationWithCityDto>> GetLocationWithCity()
         {
             var locations = await _context.Locations
                 .Include(x => x.City)
-                .Include(x => x.LocationAvailabilities)
                 .ToListAsync();
 
-            var result = locations.Select(location => new GetLocationWithCityAndAvailabilityDto
+            var result = locations.Select(location => new GetLocationWithCityDto
             {
                 LocationId = location.LocationId,
                 LocationName = location.LocationName,
-                StartTime = location.StartTime,
-                EndTime = location.EndTime,
                 Description = location.Description,
                 City = new ResultCityDto
                 {
                     CityId = location.City.CityId,
                     CityName = location.City.CityName
-                },
-                LocationAvailabilities = location.LocationAvailabilities.Select(la => new ResultLocationAvailabilityDto
-                {
-                    LocationAvailabilityId = la.LocationAvailabilityId,
-                    DayOfWeek = la.DayOfWeek,
-                    IsAvailable = la.IsAvailable,
-                    LocationId = la.LocationId
-                }).ToList()
+                }
             }).ToList();
 
             return result;

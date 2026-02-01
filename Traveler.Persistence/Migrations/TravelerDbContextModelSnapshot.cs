@@ -392,58 +392,6 @@ namespace Traveler.Persistence.Migrations
                     b.ToTable("CarClasses");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.CarFeature", b =>
-                {
-                    b.Property<int>("CarFeatureId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CarFeatureId"));
-
-                    b.Property<bool>("Available")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FeatureId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CarFeatureId");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("FeatureId");
-
-                    b.ToTable("CarFeatures");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.CarPricing", b =>
-                {
-                    b.Property<int>("CarPricingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CarPricingId"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PricingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CarPricingId");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("PricingId");
-
-                    b.ToTable("CarPricings");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.City", b =>
                 {
                     b.Property<int>("CityId")
@@ -537,30 +485,6 @@ namespace Traveler.Persistence.Migrations
                     b.ToTable("Locations");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.LocationAvailability", b =>
-                {
-                    b.Property<int>("LocationAvailabilityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LocationAvailabilityId"));
-
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("LocationAvailabilityId");
-
-                    b.HasIndex("LocationId");
-
-                    b.ToTable("LocationAvailabilities");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.MileagePackage", b =>
                 {
                     b.Property<int>("MileagePackageId")
@@ -630,6 +554,58 @@ namespace Traveler.Persistence.Migrations
                     b.HasIndex("CarClassId");
 
                     b.ToTable("Models");
+                });
+
+            modelBuilder.Entity("Traveler.Domain.Entities.ModelFeature", b =>
+                {
+                    b.Property<int>("ModelFeatureId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModelFeatureId"));
+
+                    b.Property<bool>("Available")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("FeatureId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ModelId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ModelFeatureId");
+
+                    b.HasIndex("FeatureId");
+
+                    b.HasIndex("ModelId");
+
+                    b.ToTable("ModelFeatures");
+                });
+
+            modelBuilder.Entity("Traveler.Domain.Entities.ModelPricing", b =>
+                {
+                    b.Property<int>("ModelPricingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModelPricingId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ModelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PricingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ModelPricingId");
+
+                    b.HasIndex("ModelId");
+
+                    b.HasIndex("PricingId");
+
+                    b.ToTable("ModelPricings");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.PackageOption", b =>
@@ -879,44 +855,6 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Model");
                 });
 
-            modelBuilder.Entity("Traveler.Domain.Entities.CarFeature", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.Car", "Car")
-                        .WithMany("CarFeatures")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Traveler.Domain.Entities.Feature", "Feature")
-                        .WithMany("CarFeatures")
-                        .HasForeignKey("FeatureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-
-                    b.Navigation("Feature");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.CarPricing", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.Car", "Car")
-                        .WithMany("CarPricings")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Traveler.Domain.Entities.Pricing", "Pricing")
-                        .WithMany("CarPricings")
-                        .HasForeignKey("PricingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-
-                    b.Navigation("Pricing");
-                });
-
             modelBuilder.Entity("Traveler.Domain.Entities.Location", b =>
                 {
                     b.HasOne("Traveler.Domain.Entities.City", "City")
@@ -926,17 +864,6 @@ namespace Traveler.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("City");
-                });
-
-            modelBuilder.Entity("Traveler.Domain.Entities.LocationAvailability", b =>
-                {
-                    b.HasOne("Traveler.Domain.Entities.Location", "Location")
-                        .WithMany("LocationAvailabilities")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Model", b =>
@@ -956,6 +883,44 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Brand");
 
                     b.Navigation("CarClass");
+                });
+
+            modelBuilder.Entity("Traveler.Domain.Entities.ModelFeature", b =>
+                {
+                    b.HasOne("Traveler.Domain.Entities.Feature", "Feature")
+                        .WithMany("ModelFeatures")
+                        .HasForeignKey("FeatureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Traveler.Domain.Entities.Model", "Model")
+                        .WithMany("ModelFeatures")
+                        .HasForeignKey("ModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feature");
+
+                    b.Navigation("Model");
+                });
+
+            modelBuilder.Entity("Traveler.Domain.Entities.ModelPricing", b =>
+                {
+                    b.HasOne("Traveler.Domain.Entities.Model", "Model")
+                        .WithMany("ModelPricings")
+                        .HasForeignKey("ModelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Traveler.Domain.Entities.Pricing", "Pricing")
+                        .WithMany("ModelPricings")
+                        .HasForeignKey("PricingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Model");
+
+                    b.Navigation("Pricing");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Reservation", b =>
@@ -1034,10 +999,6 @@ namespace Traveler.Persistence.Migrations
 
             modelBuilder.Entity("Traveler.Domain.Entities.Car", b =>
                 {
-                    b.Navigation("CarFeatures");
-
-                    b.Navigation("CarPricings");
-
                     b.Navigation("Reservations");
                 });
 
@@ -1053,7 +1014,7 @@ namespace Traveler.Persistence.Migrations
 
             modelBuilder.Entity("Traveler.Domain.Entities.Feature", b =>
                 {
-                    b.Navigation("CarFeatures");
+                    b.Navigation("ModelFeatures");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.Location", b =>
@@ -1061,8 +1022,6 @@ namespace Traveler.Persistence.Migrations
                     b.Navigation("Cars");
 
                     b.Navigation("DropOffReservation");
-
-                    b.Navigation("LocationAvailabilities");
 
                     b.Navigation("PickUpReservation");
                 });
@@ -1075,6 +1034,10 @@ namespace Traveler.Persistence.Migrations
             modelBuilder.Entity("Traveler.Domain.Entities.Model", b =>
                 {
                     b.Navigation("Cars");
+
+                    b.Navigation("ModelFeatures");
+
+                    b.Navigation("ModelPricings");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.PackageOption", b =>
@@ -1084,7 +1047,7 @@ namespace Traveler.Persistence.Migrations
 
             modelBuilder.Entity("Traveler.Domain.Entities.Pricing", b =>
                 {
-                    b.Navigation("CarPricings");
+                    b.Navigation("ModelPricings");
                 });
 
             modelBuilder.Entity("Traveler.Domain.Entities.SecurityPackage", b =>

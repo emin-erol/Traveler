@@ -1,0 +1,308 @@
+﻿@model GetModelWithAllDetailsViewModel
+
+@using System
+@{
+    ViewData["Title"] = "Model Detail";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+
+    var brand = ViewBag.Brand as ResultBrandViewModel;
+    var features = ViewBag.Features as List<ResultFeatureViewModel>;
+    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
+}
+
+<style>
+    .feature-item {
+        background: transparent;
+    }
+
+        .feature-item:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .feature-item.edit-mode:hover {
+            cursor: pointer;
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        .feature-item.edit-mode,
+        .feature-item.edit-mode .feature-checkbox,
+        .feature-item.edit-mode .feature-name,
+        .feature-item.edit-mode i {
+            cursor: pointer;
+        }
+
+    .feature-checkbox {
+        width: 1.1rem;
+        height: 1.1rem;
+    }
+
+    .pricing-item.edit-mode {
+        cursor: pointer;
+    }
+
+    .pricing-value {
+        min-width: 120px;
+        text-align: right;
+    }
+</style>
+
+<div class="page-content">
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="fw-bold">@brand?.Name @Model.ModelName</h2>
+                <p class="text-muted">@Model.ModelDescription</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-6 text-center">
+                <img src="@Model.BigImageUrl" alt="@Model.ModelName" class="img-fluid rounded shadow" style="max-height:400px;">
+            </div>
+            <div class="col-md-6 d-flex flex-column justify-content-center">
+                <div class="card shadow-sm p-4">
+                    <h5 class="fw-bold mb-3">Genel Bilgiler</h5>
+                    <p><strong>Marka:</strong> @brand?.Name</p>
+                    <p><strong>Model:</strong> @Model.ModelName</p>
+                    <p><strong>Sınıf:</strong> @Model.CarClass?.ClassName</p>
+                    <p><strong>Koltuk Sayısı:</strong> @Model.Seat</p>
+                    <p><strong>Bagaj Kapasitesi:</strong> @Model.Luggage</p>
+                    <p><strong>Açıklama:</strong> @Model.ModelDescription</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm position-relative">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Özellikler</h5>
+                        <button id="editFeaturesBtn" class="btn btn-sm btn-light text-primary" type="button">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="featuresList" class="row g-2">
+                            @foreach (var feature in features!)
+                            {
+                                var modelFeature = Model.ModelFeatures?.FirstOrDefault(f => f.FeatureId == feature.FeatureId);
+                                bool isAvailable = modelFeature != null && modelFeature.Available;
+                                int modelFeatureId = modelFeature?.ModelFeatureId ?? 0;
+
+                                <div class="col-md-4 mb-2">
+                                    <div class="feature-item d-flex align-items-center p-2 rounded"
+                                         data-feature-id="@feature.FeatureId"
+                                         data-model-feature-id="@modelFeatureId">
+
+                                        <input type="checkbox" class="feature-checkbox form-check-input me-2 d-none" @(isAvailable ? "checked" : "") />
+                                        <i class="availability-icon bi bi-check-circle-fill text-success me-2 @(isAvailable ? "" : "d-none")"></i>
+                                        <i class="unavailability-icon bi bi-x-circle-fill text-danger me-2 @(!isAvailable ? "" : "d-none")"></i>
+                                        <span class="feature-name ml-1 @(isAvailable ? "fw-semibold" : "text-muted")">@feature.FeatureName</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="text-end mt-3 d-none" id="saveFeaturesContainer">
+                            <button id="saveFeaturesBtn" class="btn btn-success px-4">
+                                <i class="bi bi-check-circle"></i> Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm position-relative">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Fiyatlandırmalar</h5>
+                        <button id="editPricingsBtn" class="btn btn-sm btn-light text-success" type="button">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="pricingList">
+                            @if (pricings != null && pricings.Any())
+                            {
+                                foreach (var pricing in pricings)
+                                {
+                                    var modelPricing = Model.ModelPricings?.FirstOrDefault(mp => mp.PricingId == pricing.PricingId);
+                                    if (modelPricing == null) continue;
+
+                                    string pricingTypeText;
+                                    try { pricingTypeText = Enum.GetName(typeof(PricingTypeEnum), pricing.PricingType) ?? "Bilinmiyor"; }
+                                    catch { pricingTypeText = "Bilinmiyor"; }
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="pricing-item border rounded p-3 shadow-sm d-flex justify-content-between align-items-center"
+                                             data-pricing-id="@pricing.PricingId"
+                                             data-model-pricing-id="@modelPricing.ModelPricingId">
+
+                                            <div>
+                                                <strong>@pricing.Quantity</strong> <span class="ms-1">@pricingTypeText</span> fiyatı:
+                                            </div>
+                                            <div class="pricing-value fw-bold text-success">
+                                                <span class="pricing-text">@modelPricing.Amount.ToString() ₺</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12 text-muted">Herhangi bir fiyatlandırma tipi bulunmamaktadır.</div>
+                            }
+                        </div>
+
+                        <div class="text-end mt-3 d-none" id="savePricingsContainer">
+                            <button id="savePricingsBtn" class="btn btn-success px-4">
+                                <i class="bi bi-check-circle"></i> Kaydet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<script>
+    $(function () {
+        let editFeaturesMode = false;
+        let editPricingsMode = false;
+
+        $("#editFeaturesBtn").on("click", function () {
+            editFeaturesMode = !editFeaturesMode;
+
+            if (editFeaturesMode) {
+                $(".feature-checkbox").removeClass("d-none");
+                $(".availability-icon, .unavailability-icon").addClass("d-none");
+                $("#saveFeaturesContainer").removeClass("d-none");
+                $(".feature-item").addClass("edit-mode");
+                $(this).addClass("btn-warning text-white").html('<i class="bi bi-x-lg"></i> İptal');
+            } else {
+                $(".feature-checkbox").addClass("d-none");
+                updateIconsFromCheckboxes();
+                $("#saveFeaturesContainer").addClass("d-none");
+                $(".feature-item").removeClass("edit-mode");
+                $(this).removeClass("btn-warning text-white").html('<i class="bi bi-pencil-fill"></i>');
+            }
+        });
+
+        $(document).on("click", ".feature-item.edit-mode", function (e) {
+            if (!$(e.target).hasClass("feature-checkbox")) {
+                const $checkbox = $(this).find(".feature-checkbox");
+                $checkbox.prop("checked", !$checkbox.prop("checked"));
+            }
+        });
+
+        $("#saveFeaturesBtn").on("click", function () {
+            const modelId = @Model.ModelId;
+            const features = [];
+            $(".feature-item").each(function () {
+                features.push({
+                    ModelFeatureId: $(this).data("model-feature-id") || 0,
+                    ModelId: modelId,
+                    FeatureId: $(this).data("feature-id"),
+                    Available: $(this).find(".feature-checkbox").is(":checked")
+                });
+            });
+
+            $.ajax({
+                url: `/Admin/Model/UpdateModelFeatures`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(features),
+                success: function () {
+                    updateIconsFromCheckboxes();
+                    $(".feature-checkbox").addClass("d-none");
+                    $("#saveFeaturesContainer").addClass("d-none");
+                    $(".feature-item").removeClass("edit-mode");
+                    $("#editFeaturesBtn").removeClass("btn-warning text-white").html('<i class="bi bi-pencil-fill"></i>');
+                    editFeaturesMode = false;
+                    Swal.fire({ icon: "success", title: "Başarılı", text: "Özellikler güncellendi", timer: 1400, showConfirmButton: false });
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Hata", text: "Özellikler güncellenirken hata oluştu." });
+                }
+            });
+        });
+
+        function updateIconsFromCheckboxes() {
+            $(".feature-item").each(function () {
+                const checked = $(this).find(".feature-checkbox").is(":checked");
+                $(this).find(".availability-icon").toggleClass("d-none", !checked);
+                $(this).find(".unavailability-icon").toggleClass("d-none", checked);
+                $(this).find(".feature-name").toggleClass("text-muted", !checked).toggleClass("fw-semibold", checked);
+            });
+        }
+
+        $("#editPricingsBtn").on("click", function () {
+            editPricingsMode = !editPricingsMode;
+
+            $(".pricing-item").each(function () {
+                const $valueDiv = $(this).find(".pricing-value");
+                const currentAmount = $valueDiv.find(".pricing-text").text().replace(/\./g,'');
+
+                if (editPricingsMode) {
+                    $valueDiv.html('<input type="text" class="form-control pricing-input" value="'+currentAmount+'" style="width:140px; text-align:left;">');
+                } else {
+                    const val = parseFloat($valueDiv.find("input").val()) || 0;
+                    $valueDiv.html('<span class="pricing-text">'+val.toLocaleString('tr-TR')+'</span>');
+                }
+            });
+
+            $("#savePricingsContainer").toggleClass("d-none", !editPricingsMode);
+            $(".pricing-item").toggleClass("edit-mode", editPricingsMode);
+
+            if (editPricingsMode)
+                $(this).addClass("btn-warning text-white").html('<i class="bi bi-x-lg"></i> İptal');
+            else
+                $(this).removeClass("btn-warning text-white").html('<i class="bi bi-pencil-fill"></i>');
+        });
+
+        $("#savePricingsBtn").on("click", function () {
+            const modelId = @Model.ModelId;
+            const pricingsToUpdate = [];
+
+            $(".pricing-item").each(function () {
+                const $valueDiv = $(this).find(".pricing-value");
+                const amount = parseFloat($valueDiv.find("input").val()) || 0;
+
+                pricingsToUpdate.push({
+                    ModelPricingId: $(this).data("model-pricing-id"),
+                    ModelId: modelId,
+                    PricingId: $(this).data("pricing-id"),
+                    Amount: amount
+                });
+            });
+
+            $.ajax({
+                url: `/Admin/Model/UpdateModelPricings`,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(pricingsToUpdate),
+                success: function () {
+                    $(".pricing-item").each(function () {
+                        const $valueDiv = $(this).find(".pricing-value");
+                        const val = parseFloat($valueDiv.find("input").val()) || 0;
+                        $valueDiv.html('<span class="pricing-text">'+val.toLocaleString('tr-TR')+'</span>');
+                    });
+
+                    $("#savePricingsContainer").addClass("d-none");
+                    $(".pricing-item").removeClass("edit-mode");
+                    $("#editPricingsBtn").removeClass("btn-warning text-white").html('<i class="bi bi-pencil-fill"></i>');
+                    editPricingsMode = false;
+
+                    Swal.fire({ icon: "success", title: "Başarılı", text: "Fiyatlar güncellendi", timer: 1400, showConfirmButton: false });
+                },
+                error: function () {
+                    Swal.fire({ icon: "error", title: "Hata", text: "Fiyatlar güncellenirken hata oluştu." });
+                }
+            });
+        });
+    });
+</script>

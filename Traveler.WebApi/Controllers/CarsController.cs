@@ -49,12 +49,12 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
-        [HttpGet("GetCarsWithAllDetailsByLocation/{locationId}")]
-        public async Task<IActionResult> GetCarsWithAllDetailsByLocation(int locationId)
+        [HttpGet("GetLastCarId")]
+        public async Task<IActionResult> GetLastCarId()
         {
-            var values = await _carDal.GetCarsWithAllDetailsByLocation(locationId);
+            var value = await _carDal.GetLastCarId();
 
-            return Ok(values);
+            return Ok(value);
         }
 
         [HttpPost]

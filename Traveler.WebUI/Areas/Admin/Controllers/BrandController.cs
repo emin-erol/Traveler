@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Traveler.ViewModel.BrandViewModels;
-using Traveler.ViewModel.CarClassViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
 {
@@ -23,19 +23,12 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var client = _httpClientFactory.CreateClient();
-
             var response = await client.GetAsync("https://localhost:7252/api/Brands/GetBrandsWithModels");
-            var carClassResponse = await client.GetAsync("https://localhost:7252/api/CarClasses");
 
-            if (response.IsSuccessStatusCode && carClassResponse.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 var jsonData = await response.Content.ReadAsStringAsync();
-                var carClassJson = await carClassResponse.Content.ReadAsStringAsync();
-
                 var values = JsonConvert.DeserializeObject<List<GetBrandsWithModelsViewModel>>(jsonData);
-                var carClassValues = JsonConvert.DeserializeObject<List<ResultCarClassViewModel>>(carClassJson);
-
-                ViewBag.CarClasses = carClassValues;
 
                 return View(values);
             }
@@ -44,7 +37,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         }
 
         [Route("CreateBrandModal")]
-        public async Task<IActionResult> CreateBrandModal()
+        public IActionResult CreateBrandModal()
         {
             return View();
         }
@@ -60,7 +53,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
             var response = await client.PostAsync("https://localhost:7252/api/Brands", content);
 
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction("Index", "Brand");
             }

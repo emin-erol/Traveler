@@ -81,17 +81,29 @@ namespace Traveler.Persistence.Repositories
                         Seat = m.Seat,
                         Luggage = m.Luggage,
                         BigImageUrl = m.BigImageUrl,
-                        Brand = null!,
+
                         CarClass = new CarClassDto
                         {
                             CarClassId = m.CarClass.CarClassId,
                             ClassName = m.CarClass.ClassName
-                        }
+                        },
+
+                        Brand = null!
                     }).ToList()
                 })
                 .ToListAsync();
 
             return result;
+        }
+
+        public async Task<string> GetBrandNameById(int brandId)
+        {
+            var brandName = await _context.Brands
+                .Where(x => x.BrandId == brandId)
+                .Select(x => x.Name)
+                .FirstOrDefaultAsync();
+
+            return brandName!;
         }
     }
 }

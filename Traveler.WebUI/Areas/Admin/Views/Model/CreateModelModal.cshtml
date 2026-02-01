@@ -1,0 +1,149 @@
+﻿@{
+    ViewData["Title"] = "Yeni Model Ekle";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+    var features = ViewBag.Features as List<ResultFeatureViewModel>;
+    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
+    var carClasses = ViewBag.CarClasses as List<ResultCarClassViewModel>;
+    var brand = ViewBag.Brand as ResultBrandViewModel;
+}
+
+<div class="container my-5">
+    <h4 class="mb-3">Yeni Model Ekle</h4>
+
+    <form id="createModelForm">
+        <input type="hidden" id="BrandId" value="@brand!.BrandId" />
+
+        <div class="mb-3">
+            <label class="form-label">Marka</label>
+            <input type="text" class="form-control" value="@brand.Name" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Sınıf</label>
+            <select id="CarClassId" class="form-select" required>
+                <option value="" selected disabled>Sınıf Seçiniz</option>
+                @foreach (var cls in carClasses!)
+                {
+                    <option value="@cls.CarClassId">@cls.ClassName</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Model Adı</label>
+            <input type="text" id="ModelName" class="form-control" placeholder="Model adını giriniz" required />
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Koltuk Sayısı</label>
+                <input type="number" id="Seat" class="form-control" min="1" max="9" required />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Bagaj Kapasitesi</label>
+                <input type="number" id="Luggage" class="form-control" min="1" max="10" required />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Kapak Görseli (URL)</label>
+            <input type="text" id="CoverImageUrl" class="form-control" placeholder="Kapak görseli bağlantısı" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Büyük Görsel (URL)</label>
+            <input type="text" id="BigImageUrl" class="form-control" placeholder="Büyük görsel bağlantısı" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Açıklama</label>
+            <textarea id="ModelDescription" class="form-control" rows="3" placeholder="Model açıklaması giriniz"></textarea>
+        </div>
+
+        <hr />
+        <h5>Özellikler</h5>
+        <div class="row">
+            @foreach (var feature in features!)
+            {
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input feature-checkbox" type="checkbox" value="@feature.FeatureId" id="feature_@feature.FeatureId" />
+                        <label class="form-check-label" for="feature_@feature.FeatureId">@feature.FeatureName</label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <hr />
+        <h5>Fiyatlandırmalar</h5>
+        <div class="row">
+            @foreach (var pricing in pricings!)
+            {
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">@pricing.Quantity @Enum.GetName(typeof(PricingTypeEnum), pricing.PricingType) Fiyatı</label>
+                    <input type="number" step="0.01" class="form-control pricing-input" data-pricingid="@pricing.PricingId" placeholder="₺ fiyat giriniz" />
+                </div>
+            }
+        </div>
+
+        <div class="text-end mt-2">
+            <button type="button" id="btnSaveModel" class="btn btn-primary">Kaydet</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $("#btnSaveModel").click(function () {
+        const dto = {
+            BrandId: $("#BrandId").val(),
+            CarClassId: $("#CarClassId").val(),
+            ModelName: $("#ModelName").val(),
+            Seat: $("#Seat").val(),
+            Luggage: $("#Luggage").val(),
+            CoverImageUrl: $("#CoverImageUrl").val(),
+            BigImageUrl: $("#BigImageUrl").val(),
+            ModelDescription: $("#ModelDescription").val(),
+            ModelFeatures: [],
+            ModelPricings: []
+        };
+
+        // Özellikleri topla
+        $(".feature-checkbox").each(function () {
+            dto.ModelFeatures.push({
+                FeatureId: $(this).val(),
+                Available: $(this).is(":checked")
+            });
+        });
+
+        // Fiyatları topla
+        $(".pricing-input").each(function () {
+            dto.ModelPricings.push({
+                PricingId: $(this).data("pricingid"),
+                Amount: parseFloat($(this).val()) || 0
+            });
+        });
+
+        $.ajax({
+            url: "/Admin/Model/CreateModel",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(dto),
+            success: function (res) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Başarılı!",
+                    text: "Model başarıyla oluşturuldu."
+                }).then(() => {
+                    window.location.href = "/Admin/Brand/Index";
+                });
+            },
+            error: function () {
+                Swal.fire({
+                    icon: "error",
+                    title: "Hata!",
+                    text: "Model oluşturulurken bir hata oluştu."
+                });
+            }
+        });
+    });
+</script>

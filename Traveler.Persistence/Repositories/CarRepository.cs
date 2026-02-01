@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 using Traveler.Application.Dtos.BrandDtos;
 using Traveler.Application.Dtos.CarClassDtos;
 using Traveler.Application.Dtos.CarDtos;
-using Traveler.Application.Dtos.CarPricingDtos;
 using Traveler.Application.Dtos.ModelDtos;
-using Traveler.Application.Dtos.PricingDtos;
 using Traveler.Application.Interfaces;
 using Traveler.Domain.Entities;
 using Traveler.Persistence.Context;
@@ -59,26 +57,9 @@ namespace Traveler.Persistence.Repositories
                 {
                     CarId = c.CarId,
                     StockNumber = c.StockNumber,
-                    Model = new ModelDto
-                    {
-                        ModelId = c.Model.ModelId,
-                        ModelName = c.Model.ModelName,
-                        ModelDescription = c.Model.ModelDescription,
-                        CoverImageUrl = c.Model.CoverImageUrl,
-                        Seat = c.Model.Seat,
-                        Luggage = c.Model.Luggage,
-                        BigImageUrl = c.Model.BigImageUrl,
-                        Brand = new BrandDto
-                        {
-                            BrandId = c.Model.Brand.BrandId,
-                            Name = c.Model.Brand.Name
-                        },
-                        CarClass = new CarClassDto
-                        {
-                            CarClassId = c.Model.CarClass.CarClassId,
-                            ClassName = c.Model.CarClass.ClassName
-                        }
-                    }
+                    BrandName = c.Model.Brand.Name,
+                    ModelName = c.Model.ModelName,
+                    ClassName = c.Model.CarClass.ClassName
                 })
                 .ToListAsync();
 
@@ -94,11 +75,6 @@ namespace Traveler.Persistence.Repositories
                 .Include(c => c.Location)
                 .FirstOrDefaultAsync(c => c.CarId == carId);
 
-            var featureNames = await _context.CarFeatures
-                .Where(cf => cf.CarId == carId)
-                .Select(cf => cf.Feature.FeatureName)
-                .ToListAsync();
-
             if (car == null)
                 return null!;
 
@@ -112,7 +88,6 @@ namespace Traveler.Persistence.Repositories
                 Fuel = car.Fuel,
                 Description = car.Description,
                 Status = car.Status,
-                FeatureNames = featureNames,
                 LocationName = car.Location.LocationName,
                 CreatedTime = car.CreatedTime,
                 LastUsedTime = car.LastUsedTime,
@@ -141,76 +116,13 @@ namespace Traveler.Persistence.Repositories
             };
         }
 
-        public async Task<List<GetCarWithAllDetailsDto>> GetCarsWithAllDetailsByLocation(int locationId)
+        public async Task<int> GetLastCarId()
         {
-            var cars = await _context.Cars
-                .Include(c => c.Model)
-                .Include(c => c.Model)
-                    .ThenInclude(m => m.Brand)
-                .Include(c => c.Model.CarClass)
-                .Include(c => c.Location)
-                .Include(c => c.CarFeatures).ThenInclude(cf => cf.Feature)
-                .Include(c => c.CarPricings).ThenInclude(cp => cp.Pricing)
-                .Where(c => c.LocationId == locationId && c.Status == 1)
-                .ToListAsync();
+            var lastCar = await _context.Cars
+                .OrderByDescending(c => c.CarId)
+                .FirstOrDefaultAsync();
 
-            var filteredCars = cars
-                .GroupBy(c => new { c.Model.Brand.BrandId, c.Model })
-                .Select(g => g.OrderBy(c => c.LastUsedTime).First())
-                .ToList();
-
-            var result = filteredCars.Select(c => new GetCarWithAllDetailsDto
-            {
-                CarId = c.CarId,
-                StockNumber = c.StockNumber,
-                Year = c.Year,
-                Mileage = c.Mileage,
-                Transmission = c.Transmission,
-                Fuel = c.Fuel,
-                Description = c.Description,
-                Status = c.Status,
-                LicensePlate = c.LicensePlate,
-                Model = new ModelDto
-                {
-                    ModelId = c.Model.ModelId,
-                    ModelName = c.Model.ModelName,
-                    ModelDescription = c.Model.ModelDescription,
-                    CoverImageUrl = c.Model.CoverImageUrl,
-                    Seat = c.Model.Seat,
-                    Luggage = c.Model.Luggage,
-                    BigImageUrl = c.Model.BigImageUrl,
-                    Brand = new BrandDto
-                    {
-                        BrandId = c.Model.Brand.BrandId,
-                        Name = c.Model.Brand.Name
-                    },
-                    CarClass = new CarClassDto
-                    {
-                        CarClassId = c.Model.CarClass.CarClassId,
-                        ClassName = c.Model.CarClass.ClassName
-                    }
-                },
-                FeatureNames = c.CarFeatures?.Select(cf => cf.Feature.FeatureName).ToList() ?? new List<string>(),
-                LocationName = c.Location?.LocationName!,
-                CreatedTime = c.CreatedTime,
-                UpdatedTime = c.UpdatedTime,
-                LastUsedTime = c.LastUsedTime,
-                Pricings = c.CarPricings?.Select(cp => new PricingDto
-                {
-                    PricingId = cp.Pricing.PricingId,
-                    PricingType = cp.Pricing.PricingType,
-                    Quantity = cp.Pricing.Quantity,
-                }).ToList() ?? new List<PricingDto>(),
-                CarPricings = c.CarPricings?.Select(cp => new CarPricingDto
-                {
-                    CarPricingId = cp.CarPricingId,
-                    CarId = cp.CarId,
-                    PricingId = cp.PricingId,
-                    Amount = cp.Amount,
-                }).ToList() ?? new List<CarPricingDto>()
-            }).ToList();
-
-            return result;
+            return lastCar?.CarId ?? 0;
         }
     }
 }

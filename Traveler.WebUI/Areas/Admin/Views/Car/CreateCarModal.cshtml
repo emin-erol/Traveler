@@ -5,193 +5,212 @@
 @{
     ViewData["Title"] = "Yeni Araç Ekle";
     Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
-    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
 }
 
-@functions {
-    public string GetPricingTypeName(int pricingType)
-    {
-        return Enum.GetName(typeof(PricingTypeEnum), pricingType)!;
+<style>
+    .form-section {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 40px 50px;
+        margin-top: 100px;
     }
-}
 
-<div class="page-content">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
-                <div class="card shadow">
-                    <div class="card-body">
-                        <h4 class="card-title">Yeni Araç Ekle</h4>
-                        <p class="card-subtitle mb-4">
-                            Lütfen araç bilgilerini eksiksiz giriniz.
-                        </p>
+    .form-title {
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
 
-                        <form id="createCarForm">
-                            <div class="row mb-3">
-                                <label asp-for="StockNumber" class="col-sm-3 col-form-label text-end">Stok No</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="StockNumber" class="form-control" />
-                                </div>
-                            </div>
+    .form-label {
+        font-weight: 500;
+        color: #444;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 15px;
+    }
 
-                            <div class="row mb-3">
-                                <label class="col-sm-3 col-form-label text-end">Marka</label>
-                                <div class="col-sm-9">
-                                    <select id="brandDropdown" class="form-select">
-                                        <option disabled selected value="">Marka Seçin</option>
-                                        @foreach (var brand in ViewBag.Brands as List<ResultBrandViewModel>)
-                                        {
-                                            <option value="@brand.BrandId">@brand.Name</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        height: 44px;
+        box-shadow: none !important;
+    }
 
-                            <div class="row mb-3">
-                                <label asp-for="ModelId" class="col-sm-3 col-form-label text-end">Model</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="ModelId" id="modelDropdown" class="form-select">
-                                        <option disabled selected value="">Önce Marka Seçin</option>
-                                    </select>
-                                </div>
-                            </div>
+    .row.form-group {
+        margin-bottom: 22px;
+    }
 
-                            <div class="row mb-3">
-                                <label asp-for="LicensePlate" class="col-sm-3 col-form-label text-end">Plaka</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="LicensePlate" class="form-control" />
-                                </div>
-                            </div>
+    .btn-save {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: 0.3s ease;
+    }
 
-                            <div class="row mb-3">
-                                <label asp-for="Year" class="col-sm-3 col-form-label text-end">Model Yılı</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Year" class="form-control" />
-                                </div>
-                            </div>
+        .btn-save:hover {
+            background-color: #218838;
+        }
 
-                            <div class="row mb-3">
-                                <label asp-for="Mileage" class="col-sm-3 col-form-label text-end">Kilometre</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Mileage" class="form-control" />
-                                </div>
-                            </div>
+    textarea.form-control {
+        height: auto !important;
+    }
 
-                            
+    @@media (max-width: 992px) {
+        .form-section {
+            padding: 25px;
+            margin-top: 80px;
+        }
+    }
 
-                            <div class="row mb-3">
-                                <label asp-for="LocationId" class="col-sm-3 col-form-label text-end">Lokasyon</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="LocationId" class="form-select">
-                                        <option disabled selected value="">Lokasyon Seçin</option>
-                                        @foreach (var location in ViewBag.Locations as List<ResultLocationViewModel>)
-                                        {
-                                            <option value="@location.LocationId">@location.LocationName</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+    @@media (max-width: 768px) {
+        .form-label {
+            justify-content: flex-start;
+            padding-right: 0;
+            margin-bottom: 6px;
+        }
+    }
 
-                            <div class="row mb-3">
-                                <label asp-for="Fuel" class="col-sm-3 col-form-label text-end">Yakıt Türü</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="Fuel" class="form-select">
-                                        <option disabled selected value="">Yakıt Türü Seçin</option>
-                                        @foreach (FuelEnum fuel in Enum.GetValues(typeof(FuelEnum)))
-                                        {
-                                            <option value="@( (int)fuel )">@fuel</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+    .form-section {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 40px 50px;
+        margin-top: 100px;
+        padding-bottom: 120px;
+    }
+</style>
 
-                            <div class="row mb-3">
-                                <label asp-for="Transmission" class="col-sm-3 col-form-label text-end">Vites Türü</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="Transmission" class="form-select">
-                                        <option disabled selected value="">Vites Türü Seçin</option>
-                                        @foreach (TransmissionEnum trans in Enum.GetValues(typeof(TransmissionEnum)))
-                                        {
-                                            <option value="@( (int)trans )">@trans</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+<div class="container">
+    <div class="form-section">
+        <h4 class="form-title">Yeni Araç Ekle</h4>
+        <p class="text-muted text-center mb-5">Lütfen araç bilgilerini eksiksiz giriniz.</p>
 
-                            <div class="row mb-3">
-                                <label asp-for="Status" class="col-sm-3 col-form-label text-end">Durumu</label>
-                                <div class="col-sm-9">
-                                    <select asp-for="Status" class="form-select">
-                                        <option disabled selected value="">Aracın durumunu seçin</option>
-                                        @foreach (StatusEnum status in Enum.GetValues(typeof(StatusEnum)))
-                                        {
-                                            <option value="@( (int)status )">@status</option>
-                                        }
-                                    </select>
-                                </div>
-                            </div>
+        <form method="post" asp-action="CreateCar" asp-controller="Car">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="row form-group align-items-center">
+                        <label class="col-md-4 form-label">Marka</label>
+                        <div class="col-md-8">
+                            <select id="brandDropdown" class="form-select">
+                                <option disabled selected value="">Marka Seçin</option>
+                                @foreach (var brand in ViewBag.Brands as List<ResultBrandViewModel>)
+                                {
+                                    <option value="@brand.BrandId">@brand.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
 
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label text-end">Araç Özellikleri</label>
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        @foreach (var feature in ViewBag.Features as List<ResultFeatureViewModel>)
-                                        {
-                                            <div class="col-md-3 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input"
-                                                           type="checkbox"
-                                                           name="SelectedFeatureIds"
-                                                           value="@feature.FeatureId"
-                                                           id="feature_@feature.FeatureId" />
-                                                    <label class="form-check-label" for="feature_@feature.FeatureId">
-                                                        @feature.FeatureName
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="row form-group align-items-center">
+                        <label asp-for="ModelId" class="col-md-4 form-label">Model</label>
+                        <div class="col-md-8">
+                            <select asp-for="ModelId" id="modelDropdown" class="form-select">
+                                <option disabled selected value="">Önce Marka Seçin</option>
+                            </select>
+                        </div>
+                    </div>
 
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label text-end">Fiyatlandırma Bilgileri</label>
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        @foreach (var pricing in pricings!)
-                                        {
-                                            <div class="col-md-6 mb-2">
-                                                <label class="form-label">
-                                                    @pricing.Quantity @GetPricingTypeName(pricing.PricingType)
-                                                </label>
-                                                <input type="text"
-                                                       class="form-control pricing-input"
-                                                       data-pricing-id="@pricing.PricingId"
-                                                       placeholder="Fiyat girin" />
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="row form-group align-items-center">
+                        <label asp-for="LicensePlate" class="col-md-4 form-label">Plaka</label>
+                        <div class="col-md-8">
+                            <input asp-for="LicensePlate" class="form-control" placeholder="34ABC123"
+                                   oninput="this.value = this.value.toUpperCase()" />
+                        </div>
+                    </div>
 
-                            <div class="row mb-4">
-                                <label asp-for="Description" class="col-sm-3 col-form-label text-end">Açıklama</label>
-                                <div class="col-sm-9">
-                                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                                </div>
-                            </div>
+                    <div class="row form-group align-items-center">
+                        <label asp-for="Year" class="col-md-4 form-label">Model Yılı</label>
+                        <div class="col-md-8">
+                            <input asp-for="Year" class="form-control" type="number" min="2000" max="2050" placeholder="2023" />
+                        </div>
+                    </div>
 
-                            <div class="row">
-                                <div class="offset-sm-3 col-sm-9 text-end">
-                                    <button type="submit" class="btn btn-success">Kaydet</button>
-                                </div>
-                            </div>
-                        </form>
+                    <div class="row form-group align-items-center">
+                        <label asp-for="Mileage" class="col-md-4 form-label">Kilometre</label>
+                        <div class="col-md-8">
+                            <input asp-for="Mileage" class="form-control" type="number" placeholder="10000" />
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-lg-6">
+                    <div class="row form-group align-items-center">
+                        <label asp-for="LocationId" class="col-md-4 form-label">Lokasyon</label>
+                        <div class="col-md-8">
+                            <select asp-for="LocationId" class="form-select">
+                                <option disabled selected value="">Lokasyon Seçin</option>
+                                @foreach (var location in ViewBag.Locations as List<ResultLocationViewModel>)
+                                {
+                                    <option value="@location.LocationId">@location.LocationName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row form-group align-items-center">
+                        <label asp-for="Fuel" class="col-md-4 form-label">Yakıt Türü</label>
+                        <div class="col-md-8">
+                            <select asp-for="Fuel" class="form-select">
+                                <option disabled selected value="">Yakıt Türü Seçin</option>
+                                @foreach (FuelEnum fuel in Enum.GetValues(typeof(FuelEnum)))
+                                {
+                                    <option value="@((int)fuel)">@fuel</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row form-group align-items-center">
+                        <label asp-for="Transmission" class="col-md-4 form-label">Vites Türü</label>
+                        <div class="col-md-8">
+                            <select asp-for="Transmission" class="form-select">
+                                <option disabled selected value="">Vites Türü Seçin</option>
+                                @foreach (TransmissionEnum trans in Enum.GetValues(typeof(TransmissionEnum)))
+                                {
+                                    <option value="@((int)trans)">@trans</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row form-group align-items-center">
+                        <label asp-for="Status" class="col-md-4 form-label">Durumu</label>
+                        <div class="col-md-8">
+                            <select asp-for="Status" class="form-select">
+                                <option disabled selected value="">Durum Seçin</option>
+                                @foreach (StatusEnum status in Enum.GetValues(typeof(StatusEnum)))
+                                {
+                                    <option value="@((int)status)">@status</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <label asp-for="Description" class="col-md-4 form-label">Açıklama</label>
+                        <div class="col-md-8">
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Araç hakkında açıklama yazın..."></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="text-center mt-5">
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle"></i> Kaydet
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -206,77 +225,16 @@
                     type: 'GET',
                     data: { brandId: brandId },
                     success: function (models) {
-
-                        console.log('Models:', models);
                         var modelDropdown = $("#modelDropdown");
                         modelDropdown.empty();
                         modelDropdown.append('<option disabled selected value="">Model Seçin</option>');
 
-                            $.each(models, function (i, model) {
-                                modelDropdown.append('<option value="' + model.ModelId + '">' + model.ModelName + '</option>');
-                            });
+                        $.each(models, function (i, model) {
+                            modelDropdown.append('<option value="' + model.ModelId + '">' + model.ModelName + '</option>');
+                        });
                     }
                 });
             }
         });
-
-        $("#createCarForm").on("submit", function (e) {
-            e.preventDefault();
-
-            const dto = {};
-            $("#createCarForm")
-                .find("input[name], select[name], textarea[name]")
-                .each(function () {
-                const name = $(this).attr("name");
-                const type = $(this).attr("type");
-                if (type === "checkbox") {
-                    if ($(this).is(":checked")) {
-                        if (!dto[name]) {
-                            dto[name] = [];
-                        }
-                        dto[name].push(parseInt($(this).val()));
-                    }
-                } else {
-                    dto[name] = $(this).val();
-                }
-            });
-
-            const cpDtos = [];
-            $(".pricing-input").each(function () {
-                const pricingId = $(this).data("pricing-id");
-                const amount = parseFloat($(this).val());
-
-                if (!isNaN(amount) && amount > 0) {
-                    cpDtos.push({
-                        pricingId: pricingId,
-                        amount: amount,
-                        carId: 0
-                    });
-                }
-            });
-
-            const model = {
-                dto: dto,
-                cpDtos: cpDtos
-            };
-
-            $.ajax({
-                url: "/Admin/Car/CreateCar",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(model),
-                success: function (response) {
-                    if (response.success) {
-                        window.location.href = response.redirectUrl;
-                    } else {
-                        alert("İşlem başarısız: " + (response.message || "Bilinmeyen hata"));
-                    }
-                },
-                error: function () {
-                    alert("Sunucu hatası oluştu.");
-                }
-            });
-        });
-
     });
 </script>

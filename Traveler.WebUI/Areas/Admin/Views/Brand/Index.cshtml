@@ -1,129 +1,125 @@
 ﻿@model List<GetBrandsWithModelsViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Marka ve Modeller";
     Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
     int count = 0;
 }
+
+<style>
+    .brand-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .brand-row:hover {
+        background-color: #e9ecef;
+    }
+</style>
 
 <div class="page-content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-xl-12">
-                <div class="card">
+                <div class="card shadow-sm">
                     <div class="card-body">
-                        <h4 class="card-title">Marka ve Modeller</h4>
+                        <h4 class="card-title mb-3">Marka ve Modeller</h4>
                         <p class="card-subtitle mb-4">
-                            Marka ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
+                            Marka ve modeller ile ilgili işlemleri buradan gerçekleştirebilirsiniz.
                         </p>
+
                         <div class="table-responsive">
-                            <table class="table mb-0 table-bordered">
-                                <thead>
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <th style="width:40px;"></th>
-                                        <th>#</th>
-                                        <th>Marka</th>
-                                        <th>Sil</th>
-                                        <th>Güncelle</th>
+                                        <th style="width:50px;">#</th>
+                                        <th>Marka Adı</th>
+                                        <th style="width:120px;">Model Ekle</th>
+                                        <th style="width:120px;">Güncelle</th>
+                                        <th style="width:120px;">Sil</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model)
+                                    @foreach (var brandItem in Model)
                                     {
                                         count++;
-                                        var brandId = item.Brand.BrandId;
+                                        string collapseId = $"collapseBrand_{brandItem.Brand.BrandId}";
 
-                                        <tr>
-                                            <td>
-                                                <span class="toggle-models" data-target="models-@brandId" style="cursor:pointer;">
-                                                    ▶
-                                                </span>
-                                            </td>
+                                        <tr class="brand-row" data-target="#@collapseId">
                                             <td>@count</td>
-                                            <td>@item.Brand.Name</td>
                                             <td>
-                                                <a href="/Admin/Brand/RemoveBrand/@item.Brand.BrandId" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
+                                                <i class="bi bi-chevron-down me-2"></i>@brandItem.Brand.Name
                                             </td>
                                             <td>
-                                                <a href="/Admin/Brand/UpdateBrandModal/@item.Brand.BrandId" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
+                                                <a href="/Admin/Model/CreateModelModal/@brandItem.Brand.BrandId" class="btn btn-outline-primary btn-sm">Model Ekle</a>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/Brand/UpdateBrandModal/@brandItem.Brand.BrandId" class="btn btn-outline-warning btn-sm">Güncelle</a>
+                                            </td>
+                                            <td>
+                                                <a href="/Admin/Brand/Delete/@brandItem.Brand.BrandId" class="btn btn-outline-danger btn-sm">Sil</a>
                                             </td>
                                         </tr>
 
-                                        <tr id="models-@brandId" class="models-row" style="display:none;">
-                                            <td colspan="5">
-                                                <table class="table table-sm table-striped mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Model Adı</th>
-                                                            <th>Açıklama</th>
-                                                            <th>Koltuk</th>
-                                                            <th>Bavul</th>
-                                                            <th>Sınıf</th>
-                                                            <th>Kapak Resmi</th>
-                                                            <th>Büyük Resim</th>
-                                                            <th>Sil</th>
-                                                            <th>Güncelle</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var item2 in item.Models)
+                                        <tr>
+                                            <td colspan="5" class="p-0 border-0">
+                                                <div class="collapse" id="@collapseId">
+                                                    <div class="p-3">
+                                                        @if (brandItem.Models != null && brandItem.Models.Any())
                                                         {
-                                                            <tr>
-                                                                <td>@item2.ModelName</td>
-                                                                <td>@item2.ModelDescription</td>
-                                                                <td>@item2.Seat</td>
-                                                                <td>@item2.Luggage</td>
-                                                                <td>@item2.CarClass?.ClassName</td>
-                                                                <td>
-                                                                    @if (!string.IsNullOrEmpty(item2.CoverImageUrl))
-                                                                    {
-                                                                        <img src="@item2.CoverImageUrl" alt="@item2.ModelName" style="height:50px;" />
+                                                            <table class="table table-sm table-hover mb-0">
+                                                                <thead class="table-secondary">
+                                                                    <tr>
+                                                                        <th style="width:50px;">#</th>
+                                                                        <th>Model Adı</th>
+                                                                        <th>Sınıf</th>
+                                                                        <th style="width:120px;">Detaylar</th>
+                                                                        <th style="width:120px;">Güncelle</th>
+                                                                        <th style="width:120px;">Sil</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @{
+                                                                        int modelCount = 0;
+                                                                        foreach (var modelItem in brandItem.Models)
+                                                                        {
+                                                                            modelCount++;
+                                                                            <tr>
+                                                                                <td>@modelCount</td>
+                                                                                <td>@modelItem.ModelName</td>
+                                                                                <td>@modelItem.CarClass?.ClassName</td>
+                                                                                <td>
+                                                                                    <a href="/Admin/Model/ModelDetail/@modelItem.ModelId" class="btn btn-outline-info btn-sm">Detaylar</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <a href="/Admin/Model/UpdateModelModal/@modelItem.ModelId" class="btn btn-outline-warning btn-sm">Güncelle</a>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <a href="/Admin/Model/Delete/@modelItem.ModelId" class="btn btn-outline-danger btn-sm">Sil</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
                                                                     }
-                                                                </td>
-                                                                <td>
-                                                                    @if (!string.IsNullOrEmpty(item2.BigImageUrl))
-                                                                    {
-                                                                        <img src="@item2.BigImageUrl" alt="@item2.ModelName" style="height:50px;" />
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    <a href="/Admin/Model/RemoveModel/@item2.ModelId" class="btn btn-sm btn-danger">
-                                                                        <i class="fas fa-trash-alt"></i>
-                                                                    </a>
-                                                                </td>
-                                                                <td>
-                                                                    <button type="button"
-                                                                            class="btn btn-sm btn-info open-update-modal"
-                                                                            data-id="@item2.ModelId"
-                                                                            data-name="@item2.ModelName"
-                                                                            data-description="@item2.ModelDescription"
-                                                                            data-carclassid="@item2.CarClass?.CarClassId"
-                                                                            data-seat="@item2.Seat"
-                                                                            data-luggage="@item2.Luggage"
-                                                                            data-cover="@item2.CoverImageUrl"
-                                                                            data-big="@item2.BigImageUrl"
-                                                                            data-carclass="@item2.CarClass?.ClassName"
-                                                                            data-toggle="modal"
-                                                                            data-target="#updateModelModal">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
+                                                                </tbody>
+                                                            </table>
                                                         }
-                                                    </tbody>
-                                                </table>
+                                                        else
+                                                        {
+                                                            <p class="text-muted m-0">Bu markaya ait model bulunmamaktadır.</p>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-
-                            <a href="/Admin/Brand/CreateBrandModal" class="m-3 btn btn-outline-primary">Marka Ekle</a>
                         </div>
+
+                        <a href="/Admin/Brand/CreateBrandModal" class="btn btn-outline-primary mt-3">
+                            Marka Ekle
+                        </a>
+
                     </div>
                 </div>
             </div>
@@ -131,95 +127,18 @@
     </div>
 </div>
 
-<div class="modal fade" id="updateModelModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form method="post" action="/Admin/Model/UpdateModel">
-                <div class="modal-header">
-                    <h5 class="modal-title">Model Güncelle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="ModelId" name="ModelId" />
-
-                    <div class="mb-3">
-                        <label class="form-label">Model Adı</label>
-                        <input type="text" class="form-control" id="ModelName" name="ModelName" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Açıklama</label>
-                        <textarea class="form-control" id="ModelDescription" name="ModelDescription"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Koltuk</label>
-                        <input type="number" class="form-control" id="Seat" name="Seat" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Bavul</label>
-                        <input type="number" class="form-control" id="Luggage" name="Luggage" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Kapak Resmi URL</label>
-                        <input type="text" class="form-control" id="CoverImageUrl" name="CoverImageUrl" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Büyük Resim URL</label>
-                        <input type="text" class="form-control" id="BigImageUrl" name="BigImageUrl" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Araç Sınıfı</label>
-                        <select class="form-control" id="updateCarClassId" name="CarClassId">
-                            @if (ViewBag.CarClasses != null)
-                            {
-                                foreach (var cls in ViewBag.CarClasses as List<ResultCarClassViewModel>)
-                                {
-                                    <option value="@cls.CarClassId">@cls.ClassName</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Güncelle</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
-    $(document).on("click", ".toggle-models", function () {
-        var targetId = $(this).data("target");
-        var row = $("#" + targetId);
+    $(document).ready(function () {
+        $(".brand-row").on("click", function (e) {
+            if (!$(e.target).closest("a, button").length) {
+                const targetId = $(this).data("target");
+                const collapseElement = $(targetId);
 
-        if (row.is(":visible")) {
-            row.hide();
-            $(this).text("▶");
-        } else {
-            row.show();
-            $(this).text("▼");
-        }
-    });
+                collapseElement.collapse('toggle');
 
-    $(document).on("click", ".open-update-modal", function () {
-        $("#ModelId").val($(this).data("id"));
-        $("#ModelName").val($(this).data("name"));
-        $("#ModelDescription").val($(this).data("description"));
-        $("#Seat").val($(this).data("seat"));
-        $("#Luggage").val($(this).data("luggage"));
-        $("#CoverImageUrl").val($(this).data("cover"));
-        $("#BigImageUrl").val($(this).data("big"));
-
-        var carClassId = $(this).data("carclassid");
-        $('#updateCarClassId').val(carClassId);
+                const icon = $(this).find("i.bi");
+                icon.toggleClass("bi-chevron-down bi-chevron-up");
+            }
+        });
     });
 </script>

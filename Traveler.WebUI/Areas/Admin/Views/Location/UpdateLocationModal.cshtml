@@ -4,7 +4,6 @@
     ViewData["Title"] = "UpdateLocationModal";
     Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
     var cities = ViewBag.Cities as List<ResultCityViewModel>;
-    var locationAvailabilities = ViewBag.LocationAvailabilities as List<ResultLocationAvailabilityViewModel>;
 }
 
 <div class="page-content">
@@ -18,14 +17,14 @@
                             Eklemek istediğiniz yeni lokasyon bilgisini lütfen doğru giriniz ve kaydet butonuna basınız.
                         </p>
 
-                        <form id="updateLocationForm">
+                        <form method="post" asp-action="UpdateLocation" asp-controller="Location">
 
                             <input type="hidden" asp-for="LocationId" />
 
                             <div class="row mb-3">
-                                <label asp-for="LocationName" class="col-sm-3 col-form-label text-end">Lokasyon Adı</label>
+                                <label for="locationName" class="col-sm-3 col-form-label text-end">Lokasyon Adı</label>
                                 <div class="col-sm-9">
-                                    <input asp-for="LocationName" class="form-control" />
+                                    <input name="locationName" asp-for="LocationName" class="form-control" />
                                 </div>
                             </div>
 
@@ -43,49 +42,9 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label asp-for="StartTime" class="col-sm-3 col-form-label text-end">Lokasyon Açılış Saati</label>
+                                <label for="description" class="col-sm-3 col-form-label text-end">Açıklama (İsteğe bağlı)</label>
                                 <div class="col-sm-9">
-                                    <input asp-for="StartTime" type="time" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="EndTime" class="col-sm-3 col-form-label text-end">Lokasyon Kapanış Saati</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="EndTime" type="time" class="form-control" />
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <label asp-for="Description" class="col-sm-3 col-form-label text-end">Açıklama (İsteğe bağlı)</label>
-                                <div class="col-sm-9">
-                                    <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label text-end">Günler</label>
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        @for (int i = 1; i < 8; i++)
-                                        {
-                                            var dayName = Enum.GetName(typeof(DayOfWeekEnum), i);
-                                            var availability = locationAvailabilities!.FirstOrDefault(x => x.DayOfWeek == i);
-                                            var isChecked = locationAvailabilities!.Any(x => x.DayOfWeek == i && x.IsAvailable);
-                                            var availabilityId = availability?.LocationAvailabilityId ?? 0;
-
-                                            <div class="col-sm-4 form-check">
-                                                <input class="form-check-input day-checkbox"
-                                                       type="checkbox"
-                                                       value="@i"
-                                                       id="day_@i"
-                                                       data-initial="@(isChecked ? "true" : "false")"
-                                                       data-id="@availabilityId"
-                                                       @(isChecked ? "checked" : "") />
-                                                <label class="form-check-label" for="day_@i">@dayName</label>
-                                            </div>
-                                        }
-                                    </div>
+                                    <textarea name="description" asp-for="Description" class="form-control" rows="4"></textarea>
                                 </div>
                             </div>
 
@@ -99,65 +58,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function () {
-
-        $('.day-checkbox').each(function () {
-            const isChecked = $(this).is(':checked');
-            $(this).attr('data-initial', isChecked);
-        });
-
-        $('#updateLocationForm').on('submit', function (e) {
-            e.preventDefault();
-
-            const dto = {
-                LocationId: $('#LocationId').val(),
-                LocationName: $('#LocationName').val(),
-                StartTime: $('#StartTime').val(),
-                EndTime: $('#EndTime').val(),
-                Description: $('#Description').val(),
-                CityId: $('#CityId').val()
-            };
-
-            const laDtos = [];
-            const locationId = $('#LocationId').val();
-
-                $('.day-checkbox').each(function () {
-                    const checkbox = $(this);
-                    const dayOfWeek = parseInt(checkbox.val());
-                    const isChecked = checkbox.is(':checked');
-                    const initialChecked = checkbox.data('initial') === true || checkbox.data('initial') === 'true';
-                    const availabilityId = parseInt(checkbox.data('id')) || 0;
-
-                    if (isChecked !== initialChecked) {
-                        laDtos.push({
-                            LocationAvailabilityId: availabilityId,
-                            DayOfWeek: dayOfWeek,
-                            IsAvailable: isChecked,
-                            LocationId: locationId
-                        });
-                    }
-                });
-
-            const requestData = {
-                Dto: dto,
-                LaDtos: laDtos
-            };
-
-            $.ajax({
-                url: '/Admin/Location/UpdateLocation',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(requestData),
-                success: function (res) {
-                    Swal.fire("Başarılı", "Lokasyon başarıyla güncellendi.", "success")
-                        .then(() => window.location.href = res.redirectUrl);
-                },
-                error: function () {
-                    Swal.fire("Hata", "Bir şeyler ters gitti.", "error");
-                }
-            });
-        });
-    });
-</script>

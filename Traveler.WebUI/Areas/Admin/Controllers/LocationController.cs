@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System.Text;
 using Traveler.ViewModel.CarViewModels;
 using Traveler.ViewModel.CityViewModels;
-using Traveler.ViewModel.LocationAvailabilityViewModels;
 using Traveler.ViewModel.LocationViewModels;
 
 namespace Traveler.WebUI.Areas.Admin.Controllers
@@ -25,12 +24,12 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
         {
             var client = _httpClientFactory.CreateClient();
 
-            var response = await client.GetAsync("https://localhost:7252/api/Locations/GetLocationWithCityAndAvailability");
+            var response = await client.GetAsync("https://localhost:7252/api/Locations/GetLocationWithCity");
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonData = await response.Content.ReadAsStringAsync();
-                var values = JsonConvert.DeserializeObject<List<GetLocationWithCityAndAvailabilityViewModel>>(jsonData);
+                var values = JsonConvert.DeserializeObject<List<GetLocationWithCityViewModel>>(jsonData);
 
                 return View(values);
             }
@@ -59,11 +58,8 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("CreateLocation")]
-        public async Task<IActionResult> CreateLocation([FromBody] CreateLocationRequestViewModel request)
+        public async Task<IActionResult> CreateLocation(CreateLocationViewModel dto)
         {
-            var dto = request.Dto;
-            var laDtos = request.LaDtos;
-
             var client = _httpClientFactory.CreateClient();
 
             var locationJson = JsonConvert.SerializeObject(dto);
@@ -73,25 +69,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
             if(locationResponse.IsSuccessStatusCode)
             {
-                var locationData = await locationResponse.Content.ReadAsStringAsync();
-                var createdLocation = JsonConvert.DeserializeObject<ResultLocationViewModel>(locationData)!;
-
-                int newLocationId = createdLocation.LocationId;
-
-                if (laDtos != null)
-                {
-                    foreach (var la in laDtos)
-                    {
-                        la.LocationId = newLocationId;
-
-                        var laJson = JsonConvert.SerializeObject(la);
-                        StringContent laContent = new StringContent(laJson, Encoding.UTF8, "application/json");
-
-                        await client.PostAsync("https://localhost:7252/api/LocationAvailabilities", laContent);
-                    }
-                }
-
-                return Json(new { success = true, redirectUrl = Url.Action("Index", "Location") });
+                return RedirectToAction("Index", "Location");
             }
 
             return View("CreateLocationModal", dto);
@@ -105,22 +83,17 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
             var locationResponse = await client.GetAsync("https://localhost:7252/api/Locations/" + locationId);
             var citiesResponse = await client.GetAsync("https://localhost:7252/api/Cities");
-            var laResponse = await client.GetAsync("https://localhost:7252/api/LocationAvailabilities/GetAllLocationAvailabilitiesByLocationId/" + locationId);
 
             if (locationResponse.IsSuccessStatusCode &&
-                citiesResponse.IsSuccessStatusCode &&
-                laResponse.IsSuccessStatusCode)
+                citiesResponse.IsSuccessStatusCode)
             {
                 var locationJson = await locationResponse.Content.ReadAsStringAsync();
                 var citiesJson = await citiesResponse.Content.ReadAsStringAsync();
-                var laJson = await laResponse.Content.ReadAsStringAsync();
 
                 var locationValue = JsonConvert.DeserializeObject<UpdateLocationViewModel>(locationJson);
                 var citiesValues = JsonConvert.DeserializeObject<List<ResultCityViewModel>>(citiesJson);
-                var laValues = JsonConvert.DeserializeObject<List<ResultLocationAvailabilityViewModel>>(laJson);
 
                 ViewBag.Cities = citiesValues;
-                ViewBag.LocationAvailabilities = laValues;
 
                 return View(locationValue);
             }
@@ -130,11 +103,8 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("UpdateLocation")]
-        public async Task<IActionResult> UpdateLocation([FromBody] UpdateLocationRequestViewModel request)
+        public async Task<IActionResult> UpdateLocation(UpdateLocationViewModel dto)
         {
-            var dto = request.Dto;
-            var laDtos = request.LaDtos;
-
             var client = _httpClientFactory.CreateClient();
 
             var locationJson = JsonConvert.SerializeObject(dto);
@@ -144,18 +114,7 @@ namespace Traveler.WebUI.Areas.Admin.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                if(laDtos != null)
-                {
-                    foreach(var laDto in  laDtos)
-                    {
-                        var laDtoJson = JsonConvert.SerializeObject(laDto);
-                        StringContent laContent = new StringContent(laDtoJson, Encoding.UTF8, "application/json");
-
-                        await client.PutAsync("https://localhost:7252/api/LocationAvailabilities/", laContent);
-                    }
-                }
-
-                return Json(new { success = true, redirectUrl = Url.Action("Index", "Location") });
+                return RedirectToAction("Index", "Location");
             }
             
 

@@ -33,10 +33,10 @@ namespace Traveler.WebApi.Controllers
             return Ok(value);
         }
 
-        [HttpGet("GetLocationWithCityAndAvailability")]
-        public async Task<IActionResult> GetLocationWithCityAndAvailability()
+        [HttpGet("GetLocationWithCity")]
+        public async Task<IActionResult> GetLocationWithCity()
         {
-            var values = await _locationDal.GetLocationWithCityAndAvailability();
+            var values = await _locationDal.GetLocationWithCity();
 
             return Ok(values);
         }
@@ -49,8 +49,6 @@ namespace Traveler.WebApi.Controllers
                 LocationName = model.LocationName,
                 CityId = model.CityId,
                 Description = model.Description,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
             };
 
             await _locationDal.CreateAsync(location);
@@ -67,8 +65,6 @@ namespace Traveler.WebApi.Controllers
                 LocationName = model.LocationName,
                 CityId = model.CityId,
                 Description = model.Description,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
             };
 
             await _locationDal.UpdateAsync(location);

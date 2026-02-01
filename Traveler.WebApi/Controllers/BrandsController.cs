@@ -47,6 +47,14 @@ namespace Traveler.WebApi.Controllers
             return Ok(values);
         }
 
+        [HttpGet("GetBrandNameById/{brandId}")]
+        public async Task<IActionResult> GetBrandNameById(int brandId)
+        {
+            var value = await _brandDal.GetBrandNameById(brandId);
+
+            return Ok(value);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateBrand(CreateBrandDto model)
         {
@@ -57,7 +65,7 @@ namespace Traveler.WebApi.Controllers
 
             await _brandDal.CreateAsync(brand);
 
-            return Ok("Brand information has been created.");
+            return Ok(brand);
         }
 
         [HttpPut]

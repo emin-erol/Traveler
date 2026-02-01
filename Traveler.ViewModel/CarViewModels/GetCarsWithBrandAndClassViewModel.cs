@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.ViewModel.ModelViewModels;
 
 namespace Traveler.ViewModel.CarViewModels
 {
@@ -11,6 +10,8 @@ namespace Traveler.ViewModel.CarViewModels
     {
         public int CarId { get; set; }
         public string StockNumber { get; set; }
-        public ResultModelViewModel Model { get; set; }
+        public string BrandName { get; set; }
+        public string ModelName { get; set; }
+        public string ClassName { get; set; }
     }
 }

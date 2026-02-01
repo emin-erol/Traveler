@@ -12,5 +12,8 @@ namespace Traveler.Application.Interfaces
     {
         Task<List<GetModelsByBrandDto>> GetModelsByBrand(int brandId);
         Task<string> GetBrandNameByModelName(string modelName);
+        Task<GetModelWithAllDetails> GetModelWithAllDetails(int modelId);
+        Task<List<GetModelWithAllDetails>> GetAllModelsWithDetailsByLocation(int locationId);
+        Task<int> GetMostSuitableCarIdByModelId(int modelId, int locationId, DateOnly pickUpDate, DateOnly dropOffDate);
     }
 }

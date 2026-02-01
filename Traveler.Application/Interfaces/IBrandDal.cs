@@ -12,5 +12,6 @@ namespace Traveler.Application.Interfaces
     {
         Task<BrandDto> GetBrandByModelId(int modelId);
         Task<List<GetBrandsWithModelsDto>> GetBrandsWithModels();
+        Task<string> GetBrandNameById(int brandId);
     }
 }

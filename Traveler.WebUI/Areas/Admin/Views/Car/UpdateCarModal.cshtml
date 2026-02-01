@@ -1,6 +1,5 @@
 ﻿@using Traveler.ViewModel.BrandViewModels
 @using Traveler.ViewModel.CarClassViewModels
-@using Traveler.ViewModel.CarFeatureViewModels
 @model UpdateCarViewModel
 
 @{
@@ -34,12 +33,6 @@
         .Select(x => new SelectListItem { Text = x.ToString(), Value = ((int)x).ToString() })
         .ToList();
 
-    var selectedFeatureIds = (ViewBag.CarFeatures as List<ResultCarFeatureViewModel>)?
-        .Select(cf => cf.FeatureId)
-        .ToList() ?? new List<int>();
-
-    var carPricings = ViewBag.CarPricings as List<ResultCarPricingViewModel>;
-    var pricings = ViewBag.Pricings as List<ResultPricingViewModel>;
     var selectedBrand = ViewBag.SelectedBrand as ResultBrandViewModel;
     int selectedBrandId = selectedBrand.BrandId;
 }
@@ -66,12 +59,11 @@
 
                             <input type="hidden" asp-for="CarId" />
 
-                            <div class="row mb-3">
-                                <label asp-for="StockNumber" class="col-sm-3 col-form-label text-end">Stok No</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="StockNumber" class="form-control" />
-                                </div>
-                            </div>
+                            <input type="hidden" asp-for="StockNumber" />
+
+                            <input type="hidden" asp-for="CreatedTime" />
+
+                            <input type="hidden" asp-for="LastUsedTime" />
 
                             <div class="row mb-3">
                                 <label class="col-sm-3 col-form-label text-end">Marka</label>
@@ -101,6 +93,13 @@
                                 <label asp-for="Year" class="col-sm-3 col-form-label text-end">Model Yılı</label>
                                 <div class="col-sm-9">
                                     <input asp-for="Year" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <label asp-for="LicensePlate" class="col-sm-3 col-form-label text-end">Plaka</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="LicensePlate" class="form-control" />
                                 </div>
                             </div>
 
@@ -144,58 +143,6 @@
                                     <select asp-for="Status" asp-items="statusList" class="form-select">
                                         <option disabled value="">Aracın durumunu seçin</option>
                                     </select>
-                                </div>
-                            </div>
-
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label text-end">Araç Özellikleri</label>
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        @foreach (var feature in ViewBag.Features as List<ResultFeatureViewModel>)
-                                        {
-                                            <div class="col-md-3 mb-2">
-                                                <div class="form-check">
-                                                    <input class="form-check-input"
-                                                           type="checkbox"
-                                                           name="SelectedFeatureIds"
-                                                           value="@feature.FeatureId"
-                                                           id="feature_@feature.FeatureId"
-                                                           @(selectedFeatureIds.Contains(feature.FeatureId) ? "checked" : "") />
-                                                    <label class="form-check-label" for="feature_@feature.FeatureId">
-                                                        @feature.FeatureName
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-4">
-                                <label class="col-sm-3 col-form-label text-end">Fiyatlandırma Bilgileri</label>
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        @foreach (var pricing in pricings!)
-                                        {
-                                            var carPricing = carPricings?.FirstOrDefault(cp => cp.PricingId == pricing.PricingId)!;
-                                            
-                                            <div class="col-md-6 mb-2">
-                                                <label class="form-label">
-                                                    @pricing.Quantity @GetPricingTypeName(pricing.PricingType) Fiyatı
-                                                </label>
-                                                <div class="input-group">
-                                                    <input type="number"
-                                                           class="form-control pricing-input"
-                                                           data-id="@carPricing.CarPricingId"
-                                                           data-pricing-id ="@pricing.PricingId"
-                                                           data-car-id ="@Model.CarId"
-                                                           value="@(carPricing?.Amount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) ?? "0")"
-                                                           placeholder="0" />
-                                                    <span class="input-group-text">TL</span>
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
                                 </div>
                             </div>
 
@@ -244,18 +191,12 @@
             });
         }
 
-        $(".pricing-input").each(function () {
-            const carPricingId = $(this).data("id");
-            const amount = parseFloat($(this).val()) || 0;
-            originalValues[carPricingId] = amount;
-        });
-
         $("#brandDropdown").change(function () {
             var brandId = $(this).val();
 
             if (brandId) {
                 $.ajax({
-                    url: '/Car/GetModelsOfBrand',
+                    url: '/Admin/Car/GetModelsOfBrand',
                     type: 'GET',
                     data: { brandId: brandId },
                     success: function (models) {
@@ -264,65 +205,11 @@
                         modelDropdown.append('<option disabled selected value="">Model Seçin</option>');
 
                         $.each(models, function (i, model) {
-                            modelDropdown.append('<option value="' + model.modelId + '">' + model.modelName + '</option>');
+                            modelDropdown.append('<option value="' + model.ModelId + '">' + model.ModelName + '</option>');
                         });
                     }
                 });
             }
-        });
-
-        $("form").on("submit", function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            const dto = {};
-
-            formData.forEach((value, key) => {
-                if (key === "SelectedFeatureIds") {
-                    if (!dto[key]) dto[key] = [];
-                    dto[key].push(parseInt(value));
-                } else {
-                    dto[key] = value;
-                }
-            });
-
-            const cpDtos = [];
-            $(".pricing-input").each(function () {
-                const carPricingId = $(this).data("id");
-                const pricingId = $(this).data("pricing-id");
-                const carId = $(this).data("car-id");
-                const newAmount = parseFloat($(this).val()) || 0;
-                const oldAmount = originalValues[carPricingId];
-
-                if (newAmount !== oldAmount) {
-                    cpDtos.push({
-                        carPricingId: carPricingId,
-                        amount: newAmount,
-                        pricingId: pricingId,
-                        carId: carId
-                    });
-                }
-            });
-
-            const model = {
-                dto: dto,
-                cpDtos: cpDtos
-            };
-
-            console.log("Gönderilen model:", model);
-
-            $.ajax({
-                url: "/Admin/Car/UpdateCar",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(model),
-                success: function () {
-                    window.location.href = "/Admin/Car/Index";
-                },
-                error: function (xhr) {
-                    console.error("Hata:", xhr);
-                }
-            });
         });
     });
 </script>

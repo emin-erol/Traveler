@@ -12,6 +12,7 @@ namespace Traveler.ViewModel.Enums
         Saat,
         Gün,
         Hafta,
-        Ay
+        Ay,
+        Yıl
     }
 }

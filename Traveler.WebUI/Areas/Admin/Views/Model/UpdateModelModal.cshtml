@@ -1,0 +1,80 @@
+﻿@model UpdateModelViewModel
+
+@{
+    ViewData["Title"] = "Model Güncelle";
+    Layout = "~/Areas/Admin/Views/AdminUILayout/Index.cshtml";
+
+    var brands = ViewBag.Brands as List<ResultBrandViewModel>;
+    var carClasses = ViewBag.CarClass as List<ResultCarClassViewModel>;
+}
+
+<div class="container" style="margin-top: 100px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Model Güncelle</h4>
+            <a href="/Admin/Brand/Index" class="btn btn-light btn-sm">Geri Dön</a>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="UpdateModel" asp-controller="Model" asp-area="Admin" method="post">
+                <input type="hidden" asp-for="ModelId" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ModelName" class="form-label fw-semibold">Model Adı</label>
+                        <input asp-for="ModelName" class="form-control" placeholder="Model adını giriniz" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BrandId" class="form-label fw-semibold">Marka</label>
+                        <select asp-for="BrandId" class="form-select"
+                                asp-items="@(new SelectList(brands ?? Enumerable.Empty<dynamic>(), "BrandId", "Name", Model.BrandId))">
+                            <option value="" disabled>Marka Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CarClassId" class="form-label fw-semibold">Araç Sınıfı</label>
+                        <select asp-for="CarClassId" class="form-select"
+                                asp-items="@(new SelectList(carClasses ?? Enumerable.Empty<dynamic>(), "CarClassId", "ClassName", Model.CarClassId))">
+                            <option value="" disabled>Sınıf Seçiniz</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Seat" class="form-label fw-semibold">Koltuk Sayısı</label>
+                        <input asp-for="Seat" type="number" class="form-control" min="1" />
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label asp-for="Luggage" class="form-label fw-semibold">Bagaj Kapasitesi</label>
+                        <input asp-for="Luggage" type="number" class="form-control" min="0" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CoverImageUrl" class="form-label fw-semibold">Kapak Görseli URL</label>
+                        <input asp-for="CoverImageUrl" class="form-control" placeholder="Kapak görseli URL'si giriniz" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="BigImageUrl" class="form-label fw-semibold">Büyük Görsel URL</label>
+                        <input asp-for="BigImageUrl" class="form-control" placeholder="Büyük görsel URL'si giriniz" />
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label asp-for="ModelDescription" class="form-label fw-semibold">Açıklama</label>
+                        <textarea asp-for="ModelDescription" class="form-control" rows="3" placeholder="Model açıklaması giriniz"></textarea>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-check-circle me-1"></i> Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">

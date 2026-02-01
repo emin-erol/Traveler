@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Traveler.ViewModel.BrandViewModels;
-using Traveler.ViewModel.CarClassViewModels;
-using Traveler.ViewModel.CarPricingViewModels;
 using Traveler.ViewModel.ModelViewModels;
 using Traveler.ViewModel.PricingViewModels;
 
@@ -29,6 +26,5 @@ namespace Traveler.ViewModel.CarViewModels
         public DateTime UpdatedTime { get; set; }
         public DateTime LastUsedTime { get; set; }
         public List<ResultPricingViewModel> Pricings { get; set; }
-        public List<ResultCarPricingViewModel> CarPricings { get; set; }
     }
 }
